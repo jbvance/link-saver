@@ -4,14 +4,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
+const Sequelize = require('sequelize');
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
+const { controller: linksController } = require('./links');
 
 mongoose.Promise = global.Promise;
 
 const { PORT, DATABASE_URL } = require('./config');
-
 const app = express();
 
 // static assets
@@ -46,11 +47,19 @@ app.get('/api/protected', jwtAuth, (req, res) => {
   });
 });
 
-app.get('/news/*', (req, res) => {
-  return res.json({
-    message: 'USING NEWS ROUTE'
-  })
-})
+/*
+/^\/([a-z]{0,}(--))?(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/
+*/
+
+app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , linksController.createLink);
+
+// app.get(/\bhttps?:\/\/\S+/, (req, res) => {
+//   console.log(req.params);
+//   return res.json({
+//     message: 'USING ROUTE WITH NO LIST PARAM'
+//   })
+// });
+
 
 app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
@@ -62,6 +71,47 @@ let server;
 
 function runServer() {
   return new Promise((resolve, reject) => {
+    /*************************************************
+     * POSTGRES SPECIFIC STUFF
+     ************************************************/
+
+    
+    const sequelize = new Sequelize(process.env.PG_DB_NAME, process.env.PG_DB_USER, process.env.PG_DB_PASSWORD, {
+      host: process.env.PG_DB_HOST,
+      dialect: 'postgres',
+      "ssl": true,
+      "dialectOptions": {
+          "ssl": true
+      },
+      operatorsAliases: false,
+    
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      },
+    });
+    const User = sequelize.define('user', {
+      firstName: {
+        type: Sequelize.STRING
+      },
+      lastName: {
+        type: Sequelize.STRING
+      }
+    });
+    
+    // force: true will drop the table if it already exists
+    User.sync({force: true}).then(() => {
+      // Table created
+      return User.create({
+        firstName: 'John',
+        lastName: 'Hancock'
+      });
+    });
+
+     /**END OF POSTGRES SPECIFIC STUFF */
+
     mongoose.connect(DATABASE_URL, { useMongoClient: true }, err => {
       if (err) {
         return reject(err);
