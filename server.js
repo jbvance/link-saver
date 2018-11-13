@@ -46,6 +46,12 @@ app.get('/api/protected', jwtAuth, (req, res) => {
   });
 });
 
+app.get('/news/*', (req, res) => {
+  return res.json({
+    message: 'USING NEWS ROUTE'
+  })
+})
+
 app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
 });
