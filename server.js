@@ -8,7 +8,7 @@ const Sequelize = require('sequelize');
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
-const { controller: linksController } = require('./links');
+const { router: linksRouter, controller: linksController } = require('./links');
 
 mongoose.Promise = global.Promise;
 
@@ -37,6 +37,7 @@ passport.use(jwtStrategy);
 
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
+app.use('/api/links', linksRouter);
 
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
@@ -49,7 +50,7 @@ app.get('/api/protected', jwtAuth, (req, res) => {
 
 // This is the GET route for when a user preprends the app's domain to the url to bookmark (along with a possible category name)
 // This route takes the url path and creates the link, along with a category if supplied by category-name--
-app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , linksController.createLink);
+app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , jwtAuth, linksController.createLink);
 
 app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
