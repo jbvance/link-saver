@@ -12,6 +12,16 @@ const { Link, Category } = require('./models');
 //    console.log("TEST TITLE", testTitle);
 //   })();
 
+exports.getLinks = async function(req, res) {
+    Link.find({ userId: req.user.id })
+    .then(links => {
+        return res.status(200).json({
+            data: links
+        });
+    });
+    
+}
+
 exports.createLink = async function( req, res ) {    
     const split = req.path.split('--');
     let list = '';

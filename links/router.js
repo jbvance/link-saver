@@ -1,17 +1,13 @@
 'use strict';
 const express = require('express');
-const bodyParser = require('body-parser');
+const passport = require('passport');
+const jwtAuth = passport.authenticate('jwt', { session: false });
+const { getLinks } = require('./linksController');
 
 //const {Link} = require('./models');
 
 const router = express.Router();
 
-const jsonParser = bodyParser.json();
-
-router.get('/', (req, res) => {
-    return res.status(200).json({
-        message: "LINKS GO HERE"
-    });
-});
+router.get('/', jwtAuth, getLinks);
 
 module.exports = {router};
