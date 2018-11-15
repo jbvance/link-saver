@@ -1,10 +1,10 @@
 'use strict';
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
-const Sequelize = require('sequelize');
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
@@ -13,6 +13,7 @@ const { router: linksRouter, controller: linksController } = require('./links');
 mongoose.Promise = global.Promise;
 
 const { PORT, DATABASE_URL } = require('./config');
+
 const app = express();
 
 // static assets
@@ -47,6 +48,14 @@ app.get('/api/protected', jwtAuth, (req, res) => {
     data: 'rosebud'
   });
 });
+
+app.get('/', (req, res) => {
+  res.render('index', { title: 'Cool, huh?'})
+})
+
+app.get('/login', (req, res) => {
+  res.render('login');
+})
 
 // This is the GET route for when a user preprends the app's domain to the url to bookmark (along with a possible category name)
 // This route takes the url path and creates the link, along with a category if supplied by category-name--

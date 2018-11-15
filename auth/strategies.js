@@ -9,7 +9,7 @@ const { User } = require('../users/models');
 const { JWT_SECRET } = require('../config');
 
 const localStrategy = new LocalStrategy((username, password, callback) => {
-  let user;
+  let user; 
   User.findOne({ username: username })
     .then(_user => {
       user = _user;
@@ -40,11 +40,21 @@ const localStrategy = new LocalStrategy((username, password, callback) => {
     });
 });
 
+// Extract the jwt from cookie if request is coming from a browser using cookies
+const cookieExtractor = function(req) {  
+  let token = null;
+  if (req && req.cookies)
+  {
+      token = req.cookies['jwt'];
+  } 
+  return token;
+};
+
 const jwtStrategy = new JwtStrategy(
   {
     secretOrKey: JWT_SECRET,
     // Look for the JWT as a Bearer auth header
-    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
+    jwtFromRequest: ExtractJwt.fromExtractors([ExtractJwt.fromAuthHeaderWithScheme('Bearer'), cookieExtractor]),
     // Only allow HS256 tokens - the same as the ones we issue
     algorithms: ['HS256']
   },

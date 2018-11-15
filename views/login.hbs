@@ -1,0 +1,21 @@
+<section role="region" class="login-container">
+        <div class="logo">Login</div>
+        <div class="login-item">
+            <form action="/api/auth/login" method="post" class="form form-login">
+                <div class="form-field">
+                    <label class="user" for="username"><span class="hidden">Username</span></label>
+                    <input id="username" name="username" type="text" class="form-input" placeholder="Username" required>
+                </div>
+
+                <div class="form-field">
+                    <label class="lock" for="password"><span class="hidden">Password</span></label>
+                    <input id="password" name="password" type="password" class="form-input" placeholder="Password" required>
+                </div>
+
+                <div class="form-field">
+                    <input type="submit" value="Log in">
+                </div>
+            </form>
+        </div>
+
+</section>

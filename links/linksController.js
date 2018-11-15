@@ -12,7 +12,7 @@ const { Link, Category } = require('./models');
 //    console.log("TEST TITLE", testTitle);
 //   })();
 
-exports.createLink = async function( req, res ) {
+exports.createLink = async function( req, res ) {    
     const split = req.path.split('--');
     let list = '';
     let path = '';
@@ -31,8 +31,7 @@ exports.createLink = async function( req, res ) {
         })
     }
     let query = '';
-    if (req.query && Object.keys(req.query).length) {
-        console.log("QUERY FOUND", req.query);
+    if (req.query && Object.keys(req.query).length) {        
         query = '?' + Object.keys(req.query).map(key => key + '=' + req.query[key]).join('&');
         path += query;
     }
@@ -49,14 +48,14 @@ exports.createLink = async function( req, res ) {
                 category = await Category.create({ name: list.toLocaleLowerCase() })           
             }           
 
-            link = await Link.create({ href: path, category: category._id, title, favIcon });
+            link = await Link.create({ href: path, category: category._id, userId: req.user.id, title, favIcon });
             if (link) {
                 return res.status(201).json({ link })
             }  else {
                 return res.status(500).json({ error: 'Unable to create link'});
             }                                    
-        } else {
-            link = await Link.create({ href: path, title, favIcon });          
+        } else {           
+            link = await Link.create({ href: path, title, userId: req.user.id, favIcon });          
             return res.status(201).json({ link });
         }
     } catch(err) {

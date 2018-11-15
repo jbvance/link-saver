@@ -13,6 +13,11 @@ const LinkSchema = mongoose.Schema({
       default: 'New Link'
   },
 
+  userId: {
+    type: mongoose.Schema.Types.ObjectId, ref: 'User',
+    required: true
+  },
+
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
 
   favIcon: {

@@ -16,13 +16,21 @@ const createAuthToken = function(user) {
 };
 
 const localAuth = passport.authenticate('local', {session: false});
+// parse application/x-www-form-urlencoded
+router.use(bodyParser.urlencoded({ extended: false })) 
+// parse application/json
 router.use(bodyParser.json());
 
 // The user provides a username and password to login
-router.post('/login', localAuth, (req, res) => {
+router.post('/login', localAuth, (req, res) => {  
   const authToken = createAuthToken(req.user.serialize());
+  //create a cookie so it can be sent in subsequent requests from a browser
+  res.cookie('jwt',authToken);
+ 
   res.json({authToken});
 });
+
+
 
 const jwtAuth = passport.authenticate('jwt', {session: false});
 
