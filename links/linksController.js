@@ -66,6 +66,7 @@ exports.deleteLink = function (req, res) {
 }
 
 exports.createLink = async function (req, res) {
+    console.log("USER", req.user);
     const split = req.path.split('--');
     let list = '';
     let path = '';

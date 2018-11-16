@@ -3,6 +3,7 @@ global.DATABASE_URL = 'mongodb://localhost/jwt-auth-demo-test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const { app, runServer, closeServer } = require('../server');
 const { User } = require('../users');
@@ -20,6 +21,7 @@ describe('Auth endpoints', function () {
   const password = 'examplePass';
   const firstName = 'Example';
   const lastName = 'User';
+  const id = mongoose.Types.ObjectId();
 
   before(function () {
     return runServer();
@@ -35,7 +37,8 @@ describe('Auth endpoints', function () {
         username,
         password,
         firstName,
-        lastName
+        lastName,
+        _id: id
       })
     );
   });
@@ -108,10 +111,14 @@ describe('Auth endpoints', function () {
           const payload = jwt.verify(token, JWT_SECRET, {
             algorithm: ['HS256']
           });
+          // expect(payload.user.username).to.equal(username);
+          // expect(payload.user.firstName).to.equal(firstName);
+          // expect(payload.user.lastName).to.equal(lastName);
           expect(payload.user).to.deep.equal({
             username,
             firstName,
-            lastName
+            lastName,
+            id: id.toString()
           });
         });
     });
