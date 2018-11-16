@@ -186,13 +186,11 @@ describe('/api/links', function() {
           .send({
             url            
           })                    
-          .then((res) => {
-            console.log(res.body);
+          .then((res) => {           
             response = res;
             return Category.findById(res.body.data.category.toString());
           })
-          .then(category => {            
-            console.log(response.body);
+          .then(category => {                        
             expect(category.name).to.equal('none');
             expect(response.body.data.href).to.equal(url);
             expect(response.body.data.user).to.equal(testUser._id.toString());
@@ -228,13 +226,11 @@ describe('/api/links', function() {
             url,
             category: catInput         
           })                    
-          .then((res) => {
-            console.log(res.body);
+          .then((res) => {          
             response = res;
             return Category.findById(res.body.data.category.toString());
           })
-          .then(category => {            
-            console.log(response.body);
+          .then(category => {                       
             expect(category.name).to.equal(catInput);
             expect(response.body.data.href).to.equal(url);
             expect(response.body.data.user).to.equal(testUser._id.toString());
