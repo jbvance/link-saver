@@ -11,9 +11,12 @@ const { User } = require('../users/models');
 
 //Gets links for a particular user - userId is located via the jwt payload
 exports.getLinks = function (req, res) {
+    console.log("GOT HERE");
     Link.find({
-            userId: req.user.id
+            user: req.user.id
         })
+        .populate('category')
+        .lean().populate('user', '_id username firstName lastName')          
         .then(links => {
             return res.status(200).json({
                 data: links
@@ -109,16 +112,17 @@ exports.createLink = async function (req, res) {
             name: catToFind.toLowerCase()
         });
         if (!category) {
+            console.log("NEW CATEGORY");
             category = await Category.create({
                 name: catToFind.toLowerCase(),
-                userId: req.user.id
-            });
+                user: req.user.id
+            });           
         }
 
         link = await Link.create({
             href: url,
             category: category._id,
-            userId: req.user.id,
+            user: req.user.id,
             title,
             favIcon
         });

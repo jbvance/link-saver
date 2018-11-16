@@ -6,19 +6,19 @@ mongoose.Promise = global.Promise;
 const LinkSchema = mongoose.Schema({
   href: {
     type: String,
-    required: true,    
+    required: true, 
   },
   title: {
       type: String,
       default: 'New Link'
   },
 
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId, ref: 'User',
     required: true
   },
 
-  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
 
   favIcon: {
     type: String,   
@@ -31,7 +31,7 @@ const CategorySchema = mongoose.Schema({
       required: true, 
       lowercase: true   
     },   
-    userId: { type: mongoose.Schema.Types.ObjectId, 
+    user: { type: mongoose.Schema.Types.ObjectId, 
               ref: 'User',
               required: true 
             }
