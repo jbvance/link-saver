@@ -1,6 +1,5 @@
 'use strict';
 require('dotenv').config();
-const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
@@ -17,7 +16,7 @@ if (process.env.NODE_ENV === 'test') {
   DATABASE_URL = "mongodb://localhost/jwt-auth-demo";
 }
 
-console.log("DATBASE_URL", DATABASE_URL);
+//console.log("DATBASE_URL", DATABASE_URL);
 
 const app = express();
 
@@ -38,14 +37,14 @@ app.use(function (req, res, next) {
   next();
 });
 
+const jwtAuth = passport.authenticate('jwt', { session: false });
+
 passport.use(localStrategy);
 passport.use(jwtStrategy);
 
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
 app.use('/api/links', linksRouter);
-
-const jwtAuth = passport.authenticate('jwt', { session: false });
 
 // A protected endpoint which needs a valid JWT to access it
 app.get('/api/protected', jwtAuth, (req, res) => {
