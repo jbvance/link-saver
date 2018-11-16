@@ -18,7 +18,7 @@ const LinkSchema = mongoose.Schema({
     required: true
   },
 
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+  categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
 
   favIcon: {
     type: String,   
@@ -30,7 +30,11 @@ const CategorySchema = mongoose.Schema({
       type: String,
       required: true, 
       lowercase: true   
-    },    
+    },   
+    userId: { type: mongoose.Schema.Types.ObjectId, 
+              ref: 'User',
+              required: true 
+            }
   }, { timestamps: true });
 
 

@@ -7,17 +7,7 @@ const {
     Link,
     Category
 } = require('./models');
-
-
-
-// FOR TESTING CALLS, DELETE BEFORE PUSHING TO PRODUCTION
-// (async () => {
-//    const testLogo = await getLogo('https://www.foxnews.com/us/nj-supreme-court-rules-more-than-20000-dwi-convictions-could-be-tossed');
-//    const testTitle = await getTitle('https://www.foxnews.com/us/nj-supreme-court-rules-more-than-20000-dwi-convictions-could-be-tossed');
-//    console.log("TEST LOGO", testLogo);
-//    console.log("TEST TITLE", testTitle);
-//   })();
-
+const { User } = require('../users/models');
 
 //Gets links for a particular user - userId is located via the jwt payload
 exports.getLinks = function (req, res) {
@@ -33,10 +23,11 @@ exports.getLinks = function (req, res) {
             const message = `Unable to retrieve links for user ${req.user.id}`
             console.error(message);
             return res.status(500).json({
-                error: {
-                    message
-                }
-            })
+                code: 500,
+                reason: 'ValidationError',
+                message,
+                location: 'Get Links'
+            });
         });
 }
 
@@ -46,9 +37,12 @@ exports.deleteLink = function (req, res) {
     Link.findByIdAndRemove(id)
         .then((link) => {
             if (!link) {
-                return res.status(400).json({
-                    message: `Unable to delete. No link with id ${id} found.`
-                })
+                return res.status(422).json({
+                    code: 422,
+                    reason: 'ValidationError',
+                    message: `No link with id ${id} was found.`,
+                    location: url
+                });
             }
             return res.status(200).json({
                 message: 'Record Deleted'
@@ -58,10 +52,11 @@ exports.deleteLink = function (req, res) {
             const message = `Unable to delete link with id of ${id}`
             console.error(err);
             return res.status(500).json({
-                error: {
-                    message
-                }
-            })
+                code: 500,
+                reason: 'ServerError',
+                message,
+                location: 'Delete Link'
+            });
         })
 }
 
@@ -79,7 +74,18 @@ exports.createLink = async function (req, res) {
     }
 
     const url = req.body.url;
-    const catToFind = req.body.url || 'none';
+    const catToFind = req.body.category || 'none';
+
+    // verify user exists
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: 'User does not exist',
+            location: "Create Link"
+        });
+    }
 
     // If url is not a valid url, send error response 
     if (!urlRegex({
@@ -104,7 +110,8 @@ exports.createLink = async function (req, res) {
         });
         if (!category) {
             category = await Category.create({
-                name: catToFind.toLowerCase()
+                name: catToFind.toLowerCase(),
+                userId: req.user.id
             });
         }
 
@@ -126,8 +133,13 @@ exports.createLink = async function (req, res) {
         }
 
     } catch (err) {
+        console.error(err);
         return res.status(500).json({
-            error: err.message
-        })
+            code: 500,
+            reason: 'ServerError',
+            message: 'Unable to Create Link',
+            location: 'Create Link'
+        });
     }
 };
+

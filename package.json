@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha --exit",
+    "test": "cross-env NODE_ENV=test mocha --exit",
     "dev": "nodemon server.js",
     "test-local": "SET NODE_ENV=test&& mocha --exit"
   },
@@ -38,6 +38,7 @@
   "devDependencies": {
     "chai": "^4.0.1",
     "chai-http": "^3.0.0",
+    "cross-env": "^5.2.0",
     "faker": "^3.1.0",
     "mocha": "^4.0.1"
   }
