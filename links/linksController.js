@@ -10,8 +10,7 @@ const {
 const { User } = require('../users/models');
 
 //Gets links for a particular user - userId is located via the jwt payload
-exports.getLinks = function (req, res) {
-    console.log("GOT HERE");
+exports.getLinks = function (req, res) {   
     Link.find({
             user: req.user.id
         })
@@ -35,8 +34,7 @@ exports.getLinks = function (req, res) {
 }
 
 exports.deleteLink = function (req, res) {
-    const id = req.params.id;
-    console.log("ID TO DELETE", id);
+    const id = req.params.id;    
     Link.findByIdAndRemove(id)
         .then((link) => {
             if (!link) {
@@ -79,8 +77,7 @@ exports.createLink = async function (req, res) {
     const url = req.body.url;
     const catToFind = req.body.category || 'none';
 
-    // verify user exists
-    //console.log("REQUEST USER", req.user);
+    // verify user exists    
     const user = await User.findById(req.user.id);
     if (!user) {
         return res.status(422).json({
@@ -111,16 +108,13 @@ exports.createLink = async function (req, res) {
         favIcon = await (getLogo(url));            
         category = await Category.findOne({
             name: catToFind.toLowerCase()
-        });
-        console.log("CATEGORY BEFORE", category);
-        if (!category) { 
-            console.log("NO CATEGORY");                       
+        });       
+        if (!category) {                                 
             category = await Category.create({
                 name: catToFind.toLowerCase(),
                 user: req.user.id
             });           
-        }
-        console.log("CATEGORY", category);
+        }        
         link = await Link.create({
             href: url,
             category: category._id,
