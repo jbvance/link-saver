@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: SK5QkKcqXkD10yEUpKOBhTWWzRYghR9rVvvomDqECetKXOgEYGJRsU2t2UEUxCCHsLA+BKt0NHYcX7wzai0OxESPiO7vvbVG2hwX27Uh9KO6mtNwUNA/NqHU+LLETaYC7kbvP65A4ICf6b9BYczu5R7srcrw82sat7WvYM4p3AjCm8G4CCP2IO2VXxgnkONv/W5fRfD6+wes1Ud7ISoUalDn/vrvtaYCOlwdV2n2fkMOFjBSpiyO/yBL98/HDimOO0I4Y6wYLB3iCgCTlX39ecDh+ytom8UhKXyCazkSOcng7hhORniYd1sbJevQhGZNB/2eXp3RgLswLWpnY/oz32t6QISPbz5PGP7vCy2DOMnlfKY7fxgfmLgDjzlJlUoWMXL748gKV4inT98MTatS+34uAXF5P2xiNEgGUgM2OGMsn80F4TO5by84xtdLGLFcBMn1r47/WTvSKOaiOGj2TEKIBFdCJEes+i3BEaMJhZ2EeYytNz3Bo7Np+GZzNzBF03bDko+J9DYnw2QRuN4oc/+lzxIggHf2qB4X/R87v95ZAF/7w0xHU9Upmg5/MxBO30L6t/K7rHZAKl6X7VGFxyk0/jqUQ8vAXpGECHYJc012a0Gr8udn43jVvBp0PBEazYErM7Qwpwiw3kVbDSEDUKDcvhK0Y0xJ7tjN8qi5neo=
+  app: vance-linksaver-dev-server
+  on:
+    repo: jbvance/link-saver
