@@ -26,7 +26,7 @@ router.post('/login', localAuth, (req, res) => {
   console.log("HEADER", req.header('my-header'));
   const authToken = createAuthToken(req.user.serialize());
   //create a cookie so it can be sent in subsequent requests from a browser
-  res.cookie('jwt',authToken);
+  //res.cookie('jwt',authToken);
  
   res.json({authToken});
 });

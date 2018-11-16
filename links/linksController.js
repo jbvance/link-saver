@@ -80,6 +80,7 @@ exports.createLink = async function (req, res) {
     const catToFind = req.body.category || 'none';
 
     // verify user exists
+    //console.log("REQUEST USER", req.user);
     const user = await User.findById(req.user.id);
     if (!user) {
         return res.status(422).json({
@@ -97,8 +98,8 @@ exports.createLink = async function (req, res) {
         return res.status(422).json({
             code: 422,
             reason: 'ValidationError',
-            message: `URL ${url} is not formatted properly`,
-            location: url
+            message: `URL '${url}' is not formatted properly`,
+            location: 'url'
         });
     }
 
@@ -111,14 +112,15 @@ exports.createLink = async function (req, res) {
         category = await Category.findOne({
             name: catToFind.toLowerCase()
         });
-        if (!category) {
-            console.log("NEW CATEGORY");
+        console.log("CATEGORY BEFORE", category);
+        if (!category) { 
+            console.log("NO CATEGORY");                       
             category = await Category.create({
                 name: catToFind.toLowerCase(),
                 user: req.user.id
             });           
         }
-
+        console.log("CATEGORY", category);
         link = await Link.create({
             href: url,
             category: category._id,
@@ -128,7 +130,7 @@ exports.createLink = async function (req, res) {
         });
         if (link) {
             return res.status(201).json({
-                link
+                data: link
             })
         } else {
             return res.status(500).json({

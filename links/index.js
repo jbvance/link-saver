@@ -1,5 +1,5 @@
 'use strict';
-const {Link} = require('./models');
+const {Link, Category } = require('./models');
 const {router} = require('./router');
 const  controller  = require('./linksController');
 
