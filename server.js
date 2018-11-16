@@ -12,7 +12,12 @@ const { router: linksRouter, controller: linksController } = require('./links');
 
 mongoose.Promise = global.Promise;
 
-const { PORT, DATABASE_URL } = require('./config');
+let { PORT, DATABASE_URL } = require('./config');
+if (process.env.NODE_ENV === 'test') {
+  DATABASE_URL = "mongodb://localhost/jwt-auth-demo";
+}
+
+console.log("DATBASE_URL", DATABASE_URL);
 
 const app = express();
 

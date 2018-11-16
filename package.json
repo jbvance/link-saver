@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --exit",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test-local": "SET NODE_ENV=test&& mocha --exit"
   },
   "keywords": [],
   "author": "",
