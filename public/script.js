@@ -60,7 +60,7 @@ function getSaveUrl(url = null) {
         path = decodeURIComponent(split[1]);
     } else {
         console.log("GOT HERE", split[0].replace(/^\/+/g, ''));
-        category = 'None';
+        category = 'none';
         path = decodeURIComponent(split[0].replace(/^\/+/g, ''));
     }
     console.log("CAT", category, "PATH", path);
@@ -76,7 +76,7 @@ function isLoggedIn() {
   console.log(sessionStorage.getItem('jwt'));
 }
 
-function saveLink(url, category = 'None') {
+function saveLink(url, category = 'none') {
   if (!sessionStorage.getItem('jwt')) {
     return console.error('You must be logged in to save a link');
   }

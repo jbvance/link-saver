@@ -43,7 +43,7 @@ exports.getLinks = function (req, res) {
 exports.deleteLink = function (req, res) {
     const id = req.params.id;
     console.log("ID TO DELETE", id);
-    Link.findByIdAndRemove(id)    
+    Link.findByIdAndRemove(id)
         .then((link) => {
             if (!link) {
                 return res.status(400).json({
@@ -65,79 +65,66 @@ exports.deleteLink = function (req, res) {
         })
 }
 
-exports.createLink = async function (req, res) {
-    /* TODO  MAKE SURE USER ONLY GETS HERE IF AUTHENTICATED 
-        AND REMOVE LOGIC FOR PARSING PATH (THIS IS NOW BEING DONE IN BROWSER) 
-    */
-    console.log("USER", req.user);
-    const split = req.path.split('--');
-    let list = '';
-    let path = '';
-    if (split.length > 1) {
-        list = split[0].replace(/^\/+/g, '');
-        path = split[1];
-    } else {
-        path = split[0].replace(/^\/+/g, '');
+exports.createLink = async function (req, res) {    
+    const requiredFields = ['url'];
+    const missingField = requiredFields.find(field => !(field in req.body));
+
+    if (missingField) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: 'Missing field',
+            location: missingField
+        });
     }
-    // If path is not a valid url, send error response 
+
+    const url = req.body.url;
+    const catToFind = req.body.url || 'none';
+
+    // If url is not a valid url, send error response 
     if (!urlRegex({
             exact: true
-        }).test(path)) {
-        return res.status(400).json({
-            error: {
-                message: `path ${path} is not a valid url`
-            }
-        })
-    }
-    let query = '';
-    if (req.query && Object.keys(req.query).length) {
-        query = '?' + Object.keys(req.query).map(key => key + '=' + req.query[key]).join('&');
-        path += query;
+        }).test(url)) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: `URL ${url} is not formatted properly`,
+            location: url
+        });
     }
 
     // create a variable for category and title in case we need to save it into the link below
     let category, link, title, favIcon;
 
-    try {
-        title = await getTitle(path);
-        favIcon = await (getLogo(path));
-        if (list) {
-            category = await Category.findOne({
-                name: list.toLowerCase()
-            });
-            if (!category) {
-                category = await Category.create({
-                    name: list.toLocaleLowerCase()
-                })
-            }
-
-            link = await Link.create({
-                href: path,
-                category: category._id,
-                userId: req.user.id,
-                title,
-                favIcon
-            });
-            if (link) {
-                return res.status(201).json({
-                    link
-                })
-            } else {
-                return res.status(500).json({
-                    error: 'Unable to create link'
-                });
-            }
-        } else {
-            link = await Link.create({
-                href: path,
-                title,
-                userId: req.user.id,
-                favIcon
-            });
-            return res.status(201).json({
-                link
+    try {        
+        title = await getTitle(url);        
+        favIcon = await (getLogo(url));            
+        category = await Category.findOne({
+            name: catToFind.toLowerCase()
+        });
+        if (!category) {
+            category = await Category.create({
+                name: catToFind.toLowerCase()
             });
         }
+
+        link = await Link.create({
+            href: url,
+            category: category._id,
+            userId: req.user.id,
+            title,
+            favIcon
+        });
+        if (link) {
+            return res.status(201).json({
+                link
+            })
+        } else {
+            return res.status(500).json({
+                error: 'Unable to create link'
+            });
+        }
+
     } catch (err) {
         return res.status(500).json({
             error: err.message

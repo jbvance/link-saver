@@ -15,10 +15,12 @@ async function getTitle(targetUrl) {
             html,
             url
         })
-        return Promise.resolve(metadata.title || '');
+        return Promise.resolve(metadata.title || null);
     } catch (err) {
-        //console.error(err);
-        throw new Error(err);
+        console.error(`ERROR GETTING TITLE FROM ${targetUrl}`, err);
+        //Don't throw an error. The title may not be able to be scraped, so
+        // just return null if it doesn't work
+        return Promise.resolve('');
     }
 }
 
@@ -37,7 +39,10 @@ async function getLogo(targetUrl) {
         //console.log("LOGO", metadata.logo);
         return Promise.resolve(metadata.logo || '');
     } catch (err) {
-        throw new Error(err);
+        console.error(`ERROR GETTING FAVICON FROM ${targetUrl}`, err);
+        //Don't throw an error. The title may not be able to be scraped, so
+        // just return null if it doesn't work
+        return Promise.resolve('');
     }
 
 }
