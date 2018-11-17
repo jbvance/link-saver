@@ -45,9 +45,7 @@ exports.deleteLink = function (req, res) {
                     location: 'Delete Link'
                 });
             }
-            return res.status(200).json({
-                message: 'Record Deleted'
-            });
+            return res.status(204).send();
         })
         .catch(err => {
             const message = `Unable to delete link with id of ${id}`

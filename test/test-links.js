@@ -23,8 +23,7 @@ describe('/api/links', function() {
     const lastName = 'User';
     
     const testLink = {
-      href: 'https://www.google.com',
-      category:'news'
+      href: 'https://www.google.com',      
       // id for user is set in beforeEach below
     }
 
@@ -259,8 +258,7 @@ describe('/api/links', function() {
           });
         });
 
-      it ('should delete a link', function() {
-        let link = null;
+      it ('should delete a link', function() {        
         let response = null;
         const catInput = 'news';
         const url = 'https://www.google.com';
@@ -280,7 +278,7 @@ describe('/api/links', function() {
             expiresIn: '7d'
           }
         );
-        Link.create(testLink)
+        return Link.create(testLink)
         .then(link => {
           return chai
           .request(app)
@@ -288,14 +286,13 @@ describe('/api/links', function() {
           .set('authorization', `Bearer ${token}`)                             
           .then((res) => {          
             response = res;
-            return Link.findById(testLink._id.toString());
+            return Link.findById(link._id.toString());
           })
           .then(delLink => {                       
             expect(delLink).to.be.null;
-            expect(response).to.have.status(201);
+            expect(response).to.have.status(204);
           });
-        })
-        
+        })        
       })  
 
     });
