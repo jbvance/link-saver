@@ -59,6 +59,9 @@ describe('/api/links', function() {
       User.remove({})
       .then(function() {
         return Link.remove({});
+      })
+      .then(function() {
+        return Category.remove({});
       });
     });
 
