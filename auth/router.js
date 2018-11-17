@@ -23,7 +23,7 @@ router.use(bodyParser.json());
 
 // The user provides a username and password to login
 router.post('/login', localAuth, (req, res) => {  
-  console.log("HEADER", req.header('my-header'));
+  //console.log("HEADER", req.header('my-header'));
   const authToken = createAuthToken(req.user.serialize());
   //create a cookie so it can be sent in subsequent requests from a browser
   //res.cookie('jwt',authToken);

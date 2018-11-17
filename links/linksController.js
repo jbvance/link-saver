@@ -10,13 +10,13 @@ const {
 const { User } = require('../users/models');
 
 //Gets links for a particular user - userId is located via the jwt payload
-exports.getLinks = function (req, res) {   
+exports.getLinks = function (req, res) {       
     Link.find({
             user: req.user.id
         })
         .populate('category')
         .lean().populate('user', '_id username firstName lastName')          
-        .then(links => {
+        .then(links => {            
             return res.status(200).json({
                 data: links
             });
