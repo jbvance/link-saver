@@ -21,10 +21,12 @@ describe('/api/links', function() {
     const password = 'examplePass';
     const firstName = 'Example';
     const lastName = 'User';
-    const usernameB = 'exampleUserB';
-    const passwordB = 'examplePassB';
-    const firstNameB = 'ExampleB';
-    const lastNameB = 'UserB';
+    
+    const testLink = {
+      href: 'https://www.google.com',
+      category:'news'
+      // id for user is set in beforeEach below
+    }
 
     let testUser = null;
 
@@ -47,7 +49,7 @@ describe('/api/links', function() {
         })
         .then(user => {         
           testUser = user;   
-          //Promise.resolve();       
+          testLink.user = user._id;       
         })
       );
     });
@@ -237,6 +239,61 @@ describe('/api/links', function() {
             expect(response).to.have.status(201);
           });
       }).timeout(20000);
+     
+      it ('should not delete link if no authenticated user (jwt)', function() {        
+        return chai
+          .request(app)
+          .delete('/api/links/1234')            
+          .then(() =>
+            expect.fail(null, null, 'Request should not succeed')
+          )
+          .catch(err => {
+            if (err instanceof chai.AssertionError) {
+              throw err;
+            }  
+            const res = err.response;
+            expect(res).to.have.status(401);            
+          });
+        });
+
+      it ('should delete a link', function() {
+        let link = null;
+        let response = null;
+        const catInput = 'news';
+        const url = 'https://www.google.com';
+        const token = jwt.sign(
+          {
+            user: {
+              username,
+              firstName,
+              lastName,
+              id: testUser._id
+            }
+          },
+          JWT_SECRET,
+          {
+            algorithm: 'HS256',
+            subject: username,
+            expiresIn: '7d'
+          }
+        );
+        Link.create(testLink)
+        .then(link => {
+          return chai
+          .request(app)
+          .delete(`/api/links/${link._id.toString()}`)
+          .set('authorization', `Bearer ${token}`)                             
+          .then((res) => {          
+            response = res;
+            return Link.findById(testLink._id.toString());
+          })
+          .then(delLink => {                       
+            expect(delLink).to.be.null;
+            expect(response).to.have.status(201);
+          });
+        })
+        
+      })  
 
     });
 

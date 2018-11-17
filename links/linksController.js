@@ -42,7 +42,7 @@ exports.deleteLink = function (req, res) {
                     code: 422,
                     reason: 'ValidationError',
                     message: `No link with id ${id} was found.`,
-                    location: url
+                    location: 'Delete Link'
                 });
             }
             return res.status(200).json({
