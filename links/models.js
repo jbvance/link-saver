@@ -4,12 +4,13 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const LinkSchema = mongoose.Schema({
-  href: {
+  url: {
     type: String,
     required: true, 
   },
   title: {
       type: String,
+      required: true,
       default: 'New Link'
   },
 
@@ -26,6 +27,11 @@ const LinkSchema = mongoose.Schema({
   favIcon: {
     type: String,   
   }, 
+
+  note: {
+    type: String,
+    trim: true
+  }
 }, {timestamps: true });
 
 const CategorySchema = mongoose.Schema({

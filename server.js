@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const errorHandlers = require('./errorHandlers');
 
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
@@ -70,6 +71,15 @@ app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|ht
 app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
 });
+
+// Otherwise this was a really bad error we didn't expect! Shoot eh
+if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {  
+  /* Development Error Handler - Prints stack trace */
+  app.use(errorHandlers.developmentErrors);
+}
+
+// production error handler
+app.use(errorHandlers.productionErrors);
 
 // Referenced by both runServer and closeServer. closeServer
 // assumes runServer has run and set `server` to a server object

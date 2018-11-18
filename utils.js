@@ -19,7 +19,7 @@ async function getTitle(targetUrl) {
     } catch (err) {
         console.error(`ERROR GETTING TITLE FROM ${targetUrl}`, err);
         //Don't throw an error. The title may not be able to be scraped, so
-        // just return null if it doesn't work
+        // just return an empty title string if it doesn't work
         return Promise.resolve('');
     }
 }

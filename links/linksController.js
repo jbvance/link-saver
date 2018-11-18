@@ -1,7 +1,7 @@
 const urlRegex = require('url-regex');
 const {
     getTitle,
-    getLogo
+    getLogo,    
 } = require('../utils');
 const {
     Link,
@@ -59,6 +59,55 @@ exports.deleteLink = function (req, res) {
         })
 }
 
+exports.updateLink = async function(req, res) {    
+    const id = req.params.id;
+    const userId = req.user.id;
+    let link, updatedLink, user, err
+
+    const requiredFields = ['url', 'title', 'note'];
+    const missingField = requiredFields.find(field => !(field in req.body));
+
+    if (missingField) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: 'Missing field',
+            location: missingField
+        });
+    }
+
+    link = await Link.findById(id);    
+    if (!link) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: `Cannot delete link. No link with id ${id} found.`,
+            location: 'Update Link (link)'
+        });
+    }
+
+    user = await User.findById(link.user);
+    if(!user) {
+        return res.status(422).json({
+            code: 422,
+            reason: 'ValidationError',
+            message: `Cannot delete link. Link does not belong to user.`,
+            location: 'Update Link (user)'
+        });
+    }
+    
+    link = await Link.findByIdAndUpdate(id, req.body, { new: true });   
+    if(!link) {
+        return res.status(422).json({
+           message: "Unable to update link"
+        });
+    }
+
+    return res.status(200).json({
+        data: link
+    });
+}
+
 exports.createLink = async function (req, res) {    
     const requiredFields = ['url'];
     const missingField = requiredFields.find(field => !(field in req.body));
@@ -102,7 +151,7 @@ exports.createLink = async function (req, res) {
     let category, link, title, favIcon;
 
     try {        
-        title = await getTitle(url);        
+        title = req.body.title || await getTitle(url);        
         favIcon = await (getLogo(url));            
         category = await Category.findOne({
             name: catToFind.toLowerCase()
@@ -114,7 +163,7 @@ exports.createLink = async function (req, res) {
             });           
         }        
         link = await Link.create({
-            href: url,
+            url,
             category: category._id,
             user: req.user.id,
             title,

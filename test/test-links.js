@@ -27,7 +27,7 @@ describe('/api/links', function() {
     const lastNameB = 'UserB';
     
     const testLink = {
-      href: 'https://www.google.com',      
+      url: 'https://www.google.com',      
       // id for user is set in beforeEach below
     }
 
@@ -74,11 +74,11 @@ describe('/api/links', function() {
           ); 
           // array used for adding links for test user to db
           linkArray =  [{
-            href: 'https://www.cnn.com',
+            url: 'https://www.cnn.com',
             user: testUser._id.toString()
           },
           {
-            href: 'https://www.drudgereport.com',
+            url: 'https://www.drudgereport.com',
             user: testUser._id.toString()
       
           }];
@@ -103,7 +103,7 @@ describe('/api/links', function() {
           .request(app)
           .post('/api/links')
           .send({
-            href: 'https://www.google.com'
+            url: 'https://www.google.com'
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -118,7 +118,7 @@ describe('/api/links', function() {
           });
       });
 
-      it ('should not add a link without an href', function() {                
+      it ('should not add a link without url', function() {                
         return chai
           .request(app)
           .post('/api/links')
@@ -181,7 +181,7 @@ describe('/api/links', function() {
           })
           .then(category => {                        
             expect(category.name).to.equal('none');
-            expect(response.body.data.href).to.equal(url);
+            expect(response.body.data.url).to.equal(url);
             expect(response.body.data.user).to.equal(testUser._id.toString());
             expect(response).to.have.status(201);
           });
@@ -205,7 +205,7 @@ describe('/api/links', function() {
           })
           .then(category => {                       
             expect(category.name).to.equal(catInput);
-            expect(response.body.data.href).to.equal(url);
+            expect(response.body.data.url).to.equal(url);
             expect(response.body.data.user).to.equal(testUser._id.toString());
             expect(response).to.have.status(201);
           });
@@ -265,8 +265,8 @@ describe('/api/links', function() {
         });       
       });
     });
-    describe('/GET', function() {
 
+    describe('/GET', function() {
       it ('should return an empty array if user has no links', function() {                            
           return chai
           .request(app)
@@ -293,7 +293,7 @@ describe('/api/links', function() {
         })
         .then( function(newUser) {
           return Link.create({
-            href: 'https://www.cnn.com',
+            url: 'https://www.cnn.com',
             user: newUser._id
           })
         })
