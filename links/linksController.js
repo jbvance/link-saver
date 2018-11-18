@@ -54,7 +54,7 @@ exports.deleteLink = function (req, res) {
                 code: 500,
                 reason: 'ServerError',
                 message,
-                location: 'Delete Link'
+                location: 'id'
             });
         })
 }
@@ -82,7 +82,7 @@ exports.updateLink = async function(req, res) {
             code: 422,
             reason: 'ValidationError',
             message: `Cannot delete link. No link with id ${id} found for the user.`,
-            location: 'Update Link (link)'
+            location: 'id or user'
         });
     }   
     
@@ -121,7 +121,7 @@ exports.createLink = async function (req, res) {
             code: 422,
             reason: 'ValidationError',
             message: 'User does not exist',
-            location: "Create Link"
+            location: 'user'
         });
     }
 
@@ -174,8 +174,7 @@ exports.createLink = async function (req, res) {
         return res.status(500).json({
             code: 500,
             reason: 'ServerError',
-            message: 'Unable to Create Link',
-            location: 'Create Link'
+            message: err.message,           
         });
     }
 };
