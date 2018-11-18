@@ -62,7 +62,7 @@ exports.deleteLink = function (req, res) {
 exports.updateLink = async function(req, res) {    
     const id = req.params.id;
     const userId = req.user.id;
-    let link, updatedLink, user, err
+    let link, user
 
     const requiredFields = ['url', 'title', 'note'];
     const missingField = requiredFields.find(field => !(field in req.body));

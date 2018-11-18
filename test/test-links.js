@@ -312,4 +312,38 @@ describe('/api/links', function() {
 
     });
 
+    describe('PUT', function() {
+      it ('should update a link', function() {        
+        let response = null;   
+        const updates = {
+          title: 'updated title',
+          url: 'https://www.cnn.com',
+          note: 'updated note'
+        }             
+        return Link.create(testLink)
+        .then(link => {         
+          return chai
+          .request(app)
+          .put(`/api/links/${link._id.toString()}`)
+          .set('authorization', `Bearer ${token}`)    
+          .send(updates)                         
+          .then((res) => {          
+            response = res;
+            return Link.findById(link._id.toString());
+          })
+          .then(updatedLink => {   
+            const { title, url, note } = response.body.data;
+            expect(response.body.data).to.be.an('object');  
+            expect(title).to.equal(updates.title);
+            expect(url).to.equal(updates.url);
+            expect(note).to.equal(updates.note);                                    
+            expect(updatedLink.title).to.equal(updates.title);
+            expect(updatedLink.url).to.equal(updates.url);
+            expect(updatedLink.url).to.equal(updates.url);            
+            expect(response).to.have.status(200);
+          });
+        });       
+      });
+    });
+
 });
