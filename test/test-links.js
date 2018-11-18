@@ -54,7 +54,8 @@ describe('/api/links', function() {
         })
         .then(user => {         
           testUser = user;   
-          testLink.user = user._id;    
+          testLink.user = user._id; 
+
           token = jwt.sign(
             {
               user: {
@@ -71,7 +72,7 @@ describe('/api/links', function() {
               expiresIn: '7d'
             }
           ); 
-          // array used for adding links to db
+          // array used for adding links for test user to db
           linkArray =  [{
             href: 'https://www.cnn.com',
             user: testUser._id.toString()
@@ -265,12 +266,24 @@ describe('/api/links', function() {
       });
     });
     describe('/GET', function() {
+
+      it ('should return an empty array if user has no links', function() {                            
+          return chai
+          .request(app)
+          .get('/api/links/')    
+          .set('authorization', `Bearer ${token}`)        
+          .then(function(res) {            
+            expect(res.body.data).to.be.an('array');
+            expect(res.body.data).to.have.length(0);
+          });
+        });
+
       it ('should get all links for a user', function() {
-        // create 3 links for main user
+        // create links for main user
         return Link.create(linkArray)        
         .then(function () {
           //create a new user and a dummy link for the new user to test that only a particular
-          // user's links get returned
+          // user's links get returned (userB's links should NOT be returned in GET request below)
           return User.create({
               username: usernameB,
               password: passwordB,
