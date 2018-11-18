@@ -313,6 +313,22 @@ describe('/api/links', function() {
     });
 
     describe('PUT', function() {
+      it ('should return 401 response if user not authenticated', function() {
+        return chai
+          .request(app)
+          .put(`/api/links/1234`)                                              
+          .then(() =>
+            expect.fail(null, null, 'Request should not succeed')
+          )
+          .catch(err => {
+            if (err instanceof chai.AssertionError) {
+              throw err;
+            }  
+            const res = err.response;
+            expect(res).to.have.status(401);            
+          });
+      });
+
       it ('should update a link', function() {        
         let response = null;   
         const updates = {

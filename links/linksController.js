@@ -76,25 +76,15 @@ exports.updateLink = async function(req, res) {
         });
     }
 
-    link = await Link.findById(id);    
+    link = await Link.findOne({ _id: id, user: req.user.id });    
     if (!link) {
         return res.status(422).json({
             code: 422,
             reason: 'ValidationError',
-            message: `Cannot delete link. No link with id ${id} found.`,
+            message: `Cannot delete link. No link with id ${id} found for the user.`,
             location: 'Update Link (link)'
         });
-    }
-
-    user = await User.findById(link.user);
-    if(!user) {
-        return res.status(422).json({
-            code: 422,
-            reason: 'ValidationError',
-            message: `Cannot delete link. Link does not belong to user.`,
-            location: 'Update Link (user)'
-        });
-    }
+    }   
     
     link = await Link.findByIdAndUpdate(id, req.body, { new: true });   
     if(!link) {
