@@ -304,7 +304,7 @@ describe('/api/links', function() {
           .set('authorization', `Bearer ${token}`)        
           .then(function(res) {            
             expect(res.body.data).to.be.an('array');
-            expect(res.body.data).to.have.length(2);
+            expect(res.body.data).to.have.length(linkArray.length);
           })
           
         });
