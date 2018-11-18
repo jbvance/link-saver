@@ -3,10 +3,8 @@ const {
     getTitle,
     getLogo,    
 } = require('../utils');
-const {
-    Link,
-    Category
-} = require('./models');
+const { Link } = require('./models');
+const { Category } = require('../categories/models');
 const { User } = require('../users/models');
 
 //Gets links for a particular user - user's id is located via the jwt payload
@@ -165,7 +163,7 @@ exports.createLink = async function (req, res) {
             })
         } else {
             return res.status(500).json({
-                error: 'Unable to create link'
+                message: 'Unable to create link'
             });
         }
 

@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 
 const {app, runServer, closeServer} = require('../server');
 const {User} = require('../users');
-const  { Link, Category } = require('../links/models');
+const  { Link } = require('../links/models');
+const  { Category } = require('../categories/models');
 const {JWT_SECRET} = require('../config');
 
 const expect = chai.expect;
@@ -122,8 +123,7 @@ describe('/api/links', function() {
         return chai
           .request(app)
           .post('/api/links')
-          .set('authorization', `Bearer ${token}`)          
-          
+          .set('authorization', `Bearer ${token}`)                    
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
           )

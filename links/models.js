@@ -48,8 +48,5 @@ const CategorySchema = mongoose.Schema({
 
 
 const Link = mongoose.model('Link', LinkSchema);
-const Category = mongoose.model('Category', CategorySchema);
 
-
-
-module.exports = {Link, Category};
+module.exports = {Link};
