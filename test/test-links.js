@@ -21,6 +21,10 @@ describe('/api/links', function() {
     const password = 'examplePass';
     const firstName = 'Example';
     const lastName = 'User';
+    const usernameB = 'exampleUserB';
+    const passwordB = 'examplePassB';
+    const firstNameB = 'ExampleB';
+    const lastNameB = 'UserB';
     
     const testLink = {
       href: 'https://www.google.com',      
@@ -28,7 +32,9 @@ describe('/api/links', function() {
     }
 
     let testUser = null;
-
+    let token = null;  
+    let linkArray = null;  
+    
     before(function() {
         return runServer();
       });
@@ -48,13 +54,39 @@ describe('/api/links', function() {
         })
         .then(user => {         
           testUser = user;   
-          testLink.user = user._id;       
+          testLink.user = user._id;    
+          token = jwt.sign(
+            {
+              user: {
+                username,
+                firstName,
+                lastName,
+                id: testUser._id
+              }
+            },
+            JWT_SECRET,
+            {
+              algorithm: 'HS256',
+              subject: username,
+              expiresIn: '7d'
+            }
+          ); 
+          // array used for adding links to db
+          linkArray =  [{
+            href: 'https://www.cnn.com',
+            user: testUser._id.toString()
+          },
+          {
+            href: 'https://www.drudgereport.com',
+            user: testUser._id.toString()
+      
+          }];
+        
         })
       );
     });
   
-    afterEach(function() {
-      testUser = null;
+    afterEach(function() {    
       User.remove({})
       .then(function() {
         return Link.remove({});
@@ -64,7 +96,7 @@ describe('/api/links', function() {
       });
     });
 
-    describe('/api/links', function() {
+    describe('POST', function() {
       it ('should not add link if no authenticated user (jwt)', function() {
         return chai
           .request(app)
@@ -85,23 +117,7 @@ describe('/api/links', function() {
           });
       });
 
-      it ('should not add a link without an href', function() {        
-        const token = jwt.sign(
-          {
-            user: {
-              username,
-              firstName,
-              lastName,
-              id: testUser._id
-            }
-          },
-          JWT_SECRET,
-          {
-            algorithm: 'HS256',
-            subject: username,
-            expiresIn: '7d'
-          }
-        );
+      it ('should not add a link without an href', function() {                
         return chai
           .request(app)
           .post('/api/links')
@@ -124,23 +140,7 @@ describe('/api/links', function() {
       });
 
       it ('should not add a link with an invalid url', function() {        
-        const url = 'https://wwwlkj';
-        const token = jwt.sign(
-          {
-            user: {
-              username,
-              firstName,
-              lastName,
-              id: testUser._id
-            }
-          },
-          JWT_SECRET,
-          {
-            algorithm: 'HS256',
-            subject: username,
-            expiresIn: '7d'
-          }
-        );
+        const url = 'https://wwwlkj';      
         return chai
           .request(app)
           .post('/api/links')
@@ -166,23 +166,7 @@ describe('/api/links', function() {
 
       it ('should add a link without a category (defaults to "none")', function() {
         let response = null;
-        const url = 'https://www.google.com';
-        const token = jwt.sign(
-          {
-            user: {
-              username,
-              firstName,
-              lastName,
-              id: testUser._id
-            }
-          },
-          JWT_SECRET,
-          {
-            algorithm: 'HS256',
-            subject: username,
-            expiresIn: '7d'
-          }
-        );
+        const url = 'https://www.google.com';        
         return chai
           .request(app)
           .post('/api/links')
@@ -202,26 +186,10 @@ describe('/api/links', function() {
           });
       }).timeout(20000);
 
-      it ('should add a link with the provied category', function() {
+      it ('should add a link with the provided category', function() {
         let response = null;
         const catInput = 'news';
-        const url = 'https://www.google.com';
-        const token = jwt.sign(
-          {
-            user: {
-              username,
-              firstName,
-              lastName,
-              id: testUser._id
-            }
-          },
-          JWT_SECRET,
-          {
-            algorithm: 'HS256',
-            subject: username,
-            expiresIn: '7d'
-          }
-        );
+        const url = 'https://www.google.com';        
         return chai
           .request(app)
           .post('/api/links')
@@ -241,6 +209,9 @@ describe('/api/links', function() {
             expect(response).to.have.status(201);
           });
       }).timeout(20000);
+    });
+
+    describe('DELETE', function () {
      
       it ('should not delete link if no authenticated user (jwt)', function() {        
         return chai
@@ -259,9 +230,7 @@ describe('/api/links', function() {
         });
 
       it ('should delete a link', function() {        
-        let response = null;
-        const catInput = 'news';
-        const url = 'https://www.google.com';
+        let response = null;        
         const token = jwt.sign(
           {
             user: {
@@ -292,8 +261,41 @@ describe('/api/links', function() {
             expect(delLink).to.be.null;
             expect(response).to.have.status(204);
           });
-        })        
-      })  
+        });       
+      });
+    });
+    describe('/GET', function() {
+      it ('should get all links for a user', function() {
+        // create 3 links for main user
+        return Link.create(linkArray)        
+        .then(function () {
+          //create a new user and a dummy link for the new user to test that only a particular
+          // user's links get returned
+          return User.create({
+              username: usernameB,
+              password: passwordB,
+              firstName: firstNameB,
+              lastName: lastNameB
+            });        
+        })
+        .then( function(newUser) {
+          return Link.create({
+            href: 'https://www.cnn.com',
+            user: newUser._id
+          })
+        })
+        .then(function() {                
+          return chai
+          .request(app)
+          .get('/api/links/')    
+          .set('authorization', `Bearer ${token}`)        
+          .then(function(res) {            
+            expect(res.body.data).to.be.an('array');
+            expect(res.body.data).to.have.length(2);
+          })
+          
+        });
+      });
 
     });
 
