@@ -4,18 +4,18 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const jwtAuth = passport.authenticate('jwt', { session: false });
 const { createCategory, getCategories, deleteCategory, updateCategory } = require('./categoriesController');
-const errorHandlers = require('../errorHandlers');
+const { catchErrors } = require('../errorHandlers');
 
 const jsonParser = bodyParser.json();
 
 const router = express.Router();
 
-router.post('/', jwtAuth, jsonParser, errorHandlers.catchErrors(createCategory));
+router.post('/', jwtAuth, jsonParser, catchErrors(createCategory));
 
-router.get('/', jwtAuth, errorHandlers.catchErrors(getCategories));
+router.get('/', jwtAuth, catchErrors(getCategories));
 
-router.delete('/:id', jwtAuth, errorHandlers.catchErrors(deleteCategory));
+router.delete('/:id', jwtAuth, catchErrors(deleteCategory));
 
-router.put('/:id', jwtAuth, jsonParser, errorHandlers.catchErrors(updateCategory));
+router.put('/:id', jwtAuth, jsonParser, catchErrors(updateCategory));
 
 module.exports = {router};

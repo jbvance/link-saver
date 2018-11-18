@@ -29,6 +29,8 @@ exports.createCategory = async function(req, res) {
 };
 
 exports.deleteCategory = async function(req, res) {
+    let category = null;
+
     if (!req.params.id) {
         return res.status(422).json({
             code: 422,
@@ -38,23 +40,25 @@ exports.deleteCategory = async function(req, res) {
         });
     }
 
-    return Category.findOneAndRemove({
+    category =  await Category.findOneAndRemove({
         _id: req.params.id,
         user: req.user.id
     })
-    .then(category => {
-        if (!category) {
-            return res.status(422).json({
-                message:'Unable to delete. Could not find that category for the user'
-            });
-        }
-        return res.status(200).json({
-            message: `Category '${category.name}' successfully deleted.`
+    
+    if (!category) {
+        return res.status(422).json({
+            message:'Unable to delete. Could not find that category for the user'
         });
+    }
+    return res.status(200).json({
+        message: `Category '${category.name}' successfully deleted.`
     });
 };
 
 exports.updateCategory = async function(req, res) {
+
+    let category = null;
+
     if (!req.params.id) {
         return res.status(422).json({
             code: 422,
@@ -64,7 +68,7 @@ exports.updateCategory = async function(req, res) {
         });
     }
 
-    return Category.findOneAndUpdate({
+    category = await Category.findOneAndUpdate({
         _id: req.params.id,
         user: req.user.id
     }, {
@@ -72,16 +76,16 @@ exports.updateCategory = async function(req, res) {
     },{
         new: true
     })
-    .then(category => {
-        if (!category) {
-            return res.status(422).json({
-                message:'Unable to delete. Could not find that category for the user'
-            });
-        }
-        return res.status(200).json({
-           data: category
+
+    if (!category) {
+        return res.status(422).json({
+            message:'Unable to delete. Could not find that category for the user'
         });
+    }
+    return res.status(200).json({
+        data: category
     });
+ 
 };
 
 exports.getCategories = async function(req, res) {
