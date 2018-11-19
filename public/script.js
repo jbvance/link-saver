@@ -11,9 +11,10 @@ function setupMenu() {
   });
 }
 
-function watchForm() {
-  
+function watchLoginForm() {  
+ 
   $('.js-form-login').submit(function(e) {
+    hideError();
     e.preventDefault();    
     const username = $(this).find('input[name=username]').val();
     const password = $(this).find('input[name=password]').val();
@@ -40,7 +41,11 @@ function watchForm() {
       //  If the user had entered a url to get to the page and was not yet logged in,
       // go ahead and save the link the user had entered (which should be saved in sessionStorage)
       if (sessionStorage.getItem('urlToSave')) {
-        saveLink(sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'));
+        saveLink(sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
+        .then(() => {
+          clearLinkToSave();
+        })
+        .catch(err => { throw new Error( err.message )});
       }
     })
     .catch(err => {   
@@ -53,10 +58,12 @@ function watchForm() {
 }
 
 function saveLink(url, category) {
+  hideError();
   return new Promise((resolve, reject) => {
     console.log('saveLink');
     if (!sessionStorage.getItem('jwt')) {
-      return console.error('You must be logged in to save a link');
+      console.error('You must be logged in to save a link');
+      return reject('You  must be logged in to save a link. Please log in below.');
     }
     const token = sessionStorage.getItem('jwt');
     fetch('api/links', {
@@ -127,14 +134,30 @@ function createLinkOnLoad() {
       console.log("LINK", link.data);
       state.links.push(link.data);
       //clear out sessionStorage
-      sessionStorage.removeItem('category');
-      sessionStorage.removeItem('urlToSave');
-      history.pushState({}, "", "/");
+      clearLinkToSave();
     })
     .catch(err => {
-      console.error(err);      
+      console.error(err);   
+      showError(err);   
     })
   }
+}
+
+function clearLinkToSave() {
+  sessionStorage.removeItem('category');
+  sessionStorage.removeItem('urlToSave');
+  // remove query string params
+  history.pushState({}, "", "/");
+}
+
+function showError(errorText) {
+  $('.js-error').html(errorText);
+  $('.js-error').fadeIn('slow');
+}
+
+function hideError() {
+  $('.js-error').html('');
+  $('.js-error').hide();
 }
 
 function showLoggedIn() {
@@ -157,14 +180,13 @@ function validUrl(url) {
   return !result || result.length < 1 ? false : true;
 }
 
-
-
 function initApp() {
   showLoggedIn();
   getUrlToSave();
   createLinkOnLoad();
   setupMenu();
-  watchForm();
+  watchLoginForm();
+  geLinks();
 }
 
 $(initApp);
