@@ -1,4 +1,4 @@
-const state = {
+const state = {  
   links: []
 };
 
@@ -167,11 +167,36 @@ function showLoggedIn() {
   } 
 }
 
-function isLoggedIn() {  
-  console.log("JWT", sessionStorage.getItem('jwt'));
+function isLoggedIn() {   
   return !!sessionStorage.getItem('jwt');
 }
 
+
+function getLinks() {
+  return new Promise((resolve, reject) => {
+    if (!isLoggedIn) return '';
+    const token = sessionStorage.getItem('jwt');
+    fetch('api/links', {
+        method: 'GET',
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }),
+      })
+      .then(res => res.json())
+      .then(resJson => {
+        console.log("LINKS", resJson);
+        state.links = resJson.data;
+        resolve(resJson.data)
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  })
+
+}
 
 //validates a given url
 function validUrl(url) { 
@@ -180,13 +205,27 @@ function validUrl(url) {
   return !result || result.length < 1 ? false : true;
 }
 
+function displayLinks(links) {
+  console.log('In displayLinks');
+  const strHtml = links.map(link => {
+    const title = link.title || link.url;   
+    const favIcon = link.favIcon || '/images/default-icon.png'; 
+    return `<div class="link-row">
+    <div class="favicon"><img src=${favIcon}></div>
+    <div class="url-text"><a href="${link.url}">${title}</a></div>
+  </div>`
+  }).join('\n');
+  $('.js-links-container').html(strHtml);
+}
+
 function initApp() {
   showLoggedIn();
   getUrlToSave();
   createLinkOnLoad();
   setupMenu();
   watchLoginForm();
-  geLinks();
+  getLinks()
+  .then(links => displayLinks(links));
 }
 
 $(initApp);

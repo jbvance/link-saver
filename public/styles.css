@@ -28,8 +28,35 @@
     border-color: #f5c6cb;
 }
 
-  .js-login-container, .js-links-container {
+  /* .js-login-container, .js-links-container {
     display: none;
+  } */
+
+  .links-container {
+    display: flex;
+    flex-direction: column;    
+  }
+
+  .link-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: center;
+    min-height: 50px;
+    padding: 10px;
+  }
+
+  .favicon {
+      margin: 10px;
+  }
+
+  .favicon img {
+    max-width: 20px;
+    height: auto;
+  }
+
+  .url-text {
+    flex: 1 1 auto;
   }
   
   .navbar {
