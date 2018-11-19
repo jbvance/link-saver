@@ -1,7 +1,8 @@
 const urlRegex = require('url-regex');
 const {
     getTitle,
-    getLogo,    
+    getLogo, 
+    promiseTimeout   
 } = require('../utils');
 const { Link } = require('./models');
 const { Category } = require('../categories/models');
@@ -139,8 +140,8 @@ exports.createLink = async function (req, res) {
     let category, link, title, favIcon;
 
     try {        
-        title = req.body.title || await getTitle(url);        
-        favIcon = await (getLogo(url));            
+        title = req.body.title || await promiseTimeout(1000, getTitle(url));        
+        favIcon = await promiseTimeout(1000, getLogo(url));            
         category = await Category.findOne({
             name: catToFind.toLowerCase()
         });       

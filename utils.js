@@ -35,8 +35,7 @@ async function getLogo(targetUrl) {
         const metadata = await metascraper({
             html,
             url
-        })
-        //console.log("LOGO", metadata.logo);
+        })        
         return Promise.resolve(metadata.logo || '');
     } catch (err) {
         console.error(`ERROR GETTING FAVICON FROM ${targetUrl}`, err);
@@ -47,7 +46,29 @@ async function getLogo(targetUrl) {
 
 }
 
+//Effectively limits the amount of time a promise is allowed to run
+// before rejecting. This is used for potentially ong async calls
+// to prevent them from running too long. If getTitle or getLogo
+// take too long, we will resolve to a default of an empty string ('')
+promiseTimeout = function(ms, promise){
+
+    // Create a promise that rejects in <ms> milliseconds
+    let timeout = new Promise((resolve, reject) => {
+      let id = setTimeout(() => {
+        clearTimeout(id);        
+        resolve('');
+      }, ms)
+    })
+  
+    // Returns a race between our timeout and the passed in promise
+    return Promise.race([
+      promise,
+      timeout
+    ])
+  }
+
 module.exports = {
     getTitle,
-    getLogo
+    getLogo,
+    promiseTimeout
 };
