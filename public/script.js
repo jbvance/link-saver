@@ -1,4 +1,6 @@
-
+const state = {
+  links: []
+};
 
 function setupMenu() {
   let mainNav = $('#js-menu');
@@ -8,7 +10,6 @@ function setupMenu() {
     mainNav.toggleClass('active');
   });
 }
-
 
 function watchForm() {
   
@@ -27,25 +28,65 @@ function watchForm() {
       body: JSON.stringify(data)
     })
     .then(res => {     
-      if (res.status === 401) {      
+      if (res.status === 401) {             
         throw new Error('Incorrect username or password');
       } else {
         return res.json();
       }        
     })
-    .then(json => {            
+    .then(json => {    
+      // save the JWT to sessionStorage        
       sessionStorage.setItem('jwt', json.authToken);
+      //  If the user had entered a url to get to the page and was not yet logged in,
+      // go ahead and save the link the user had entered (which should be saved in sessionStorage)
+      if (sessionStorage.getItem('urlToSave')) {
+        saveLink(sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'));
+      }
     })
-    .catch(err => {     
-      console.log(err.message);
-    })
+    .catch(err => {   
+      $('.js-error').text(err.message);;
+      $('.js-error').show();  
+      console.error(err.message);
+    });
   })
 
 }
 
+function saveLink(url, category) {
+  return new Promise((resolve, reject) => {
+    console.log('saveLink');
+    if (!sessionStorage.getItem('jwt')) {
+      return console.error('You must be logged in to save a link');
+    }
+    const token = sessionStorage.getItem('jwt');
+    fetch('api/links', {
+        method: 'POST',
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }),
+        body: JSON.stringify({
+          url,
+          category
+        })
+      })
+      .then(res => res.json())
+      .then(resJson => {
+        console.log("RETURN", resJson);
+        resolve(resJson);
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      })
+  });
+
+}
+
  // user presmumably got here via entering link to save in URL bar and hit enter
- // only called on $() ready
-function getSaveUrl(url = null) {
+ // This is only called on $() ready
+function getUrlToSave(url = null) { 
   let category = null;
   let path = null;
   const urlParams = new URLSearchParams(window.location.search);  
@@ -67,21 +108,46 @@ function getSaveUrl(url = null) {
     if (!validUrl(path)) {
       console.error('Invalid url');
     } else {
-     saveLink(path, category);
+     sessionStorage.setItem('category', category);
+     sessionStorage.setItem('urlToSave', path);    
     }
+  } else {
+    sessionStorage.removeItem('category');
+    sessionStorage.removeItem('urlToSave');
   }
 }
 
-function isLoggedIn() {
-  console.log(sessionStorage.getItem('jwt'));
+function createLinkOnLoad() {
+  console.log("createLinkOnLoad");
+  const url = sessionStorage.getItem('urlToSave');
+  console.log("url", url);
+  if (url) {
+    saveLink(url, sessionStorage.getItem('category'))
+    .then((link) => {
+      console.log("LINK", link.data);
+      state.links.push(link.data);
+      //clear out sessionStorage
+      sessionStorage.removeItem('category');
+      sessionStorage.removeItem('urlToSave');
+    })
+    .catch(err => {
+      console.error(err);      
+    })
+  }
 }
 
-function saveLink(url, category = 'none') {
-  if (!sessionStorage.getItem('jwt')) {
-    return console.error('You must be logged in to save a link');
-  }
-  console.log("URL", url, "CATEGORY", category);
+function showLoggedIn() {
+  if (!isLoggedIn()) {
+    $('.js-login-container').show();
+    $('.js-links-container').hide();
+  } 
 }
+
+function isLoggedIn() {  
+  console.log("JWT", sessionStorage.getItem('jwt'));
+  return !!sessionStorage.getItem('jwt');
+}
+
 
 //validates a given url
 function validUrl(url) { 
@@ -93,8 +159,9 @@ function validUrl(url) {
 
 
 function initApp() {
-  getSaveUrl();
-  //console.log(window.location.pathname); 
+  showLoggedIn();
+  getUrlToSave();
+  createLinkOnLoad();
   setupMenu();
   watchForm();
 }
