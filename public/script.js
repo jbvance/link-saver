@@ -129,6 +129,7 @@ function createLinkOnLoad() {
       //clear out sessionStorage
       sessionStorage.removeItem('category');
       sessionStorage.removeItem('urlToSave');
+      history.pushState({}, "", "/");
     })
     .catch(err => {
       console.error(err);      
