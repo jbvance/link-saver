@@ -205,18 +205,48 @@ function validUrl(url) {
   return !result || result.length < 1 ? false : true;
 }
 
-function displayLinks(links) {
-  console.log('In displayLinks');
+function displayLinks(links) { 
   const strHtml = links.map(link => {
     const title = link.title || link.url;   
     const favIcon = link.favIcon || '/images/default-icon.png'; 
     return `<div class="link-row">
     <div class="favicon"><img src=${favIcon}></div>
     <div class="url-text"><a href="${link.url}">${title}</a></div>
-    <div><button class="btn btn-primary js-btn-edit" data-id="${link._id}">Edit</button></div>
+    <div>
+      <button class="btn btn-primary js-btn-edit" data-id="${link._id}" data-mode="edit">Edit</button>
+      <button class="btn btn-primary js-btn-delete" data-id="${link._id}" data-mode="delete">Delete</button>
+      </div>
   </div>`
   }).join('\n');
   $('.js-links-container').html(strHtml);
+}
+
+function showLinksOnLoad() {
+  getLinks()
+  .then(links => displayLinks(links));
+}
+
+function modifyButtonsHandler() {
+  // Attach a delegated event handler
+  $( '.js-links-container' ).on( "click", "button", function( event ) {
+    event.preventDefault();
+    var elem = $( this );       
+    if (elem.data('mode') === 'edit') {
+      showEditForm(elem.data('id'));
+    } else if (elem.data('mode') === 'delete') {
+      console.log('DELETE MODE');
+    }
+  });
+}
+
+function showEditForm(id) {
+  // $('js-error').hide();
+  // $('js-links-container').hide();
+  // $('js-login-container').hide();
+  const linkToEdit = state.links.find(link => link._id === id);
+  console.log('linkToEdit', linkToEdit);
+
+
 }
 
 function initApp() {
@@ -225,8 +255,8 @@ function initApp() {
   createLinkOnLoad();
   setupMenu();
   watchLoginForm();
-  getLinks()
-  .then(links => displayLinks(links));
+  showLinksOnLoad();
+  modifyButtonsHandler();
 }
 
 $(initApp);

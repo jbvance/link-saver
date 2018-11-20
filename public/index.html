@@ -61,6 +61,29 @@
         <section class="links-container js-links-container">
             
         </section>
+        <section class="js-edit-add-container">
+            <div class="container">
+                <form class="js-edit-add-form">
+                    <ul class="flex-outer">
+                        <li>
+                            <label for="title">Title</label>
+                            <input type="text" id="title" required placeholder="Enter the title here">
+                        </li>
+                        <li>
+                            <label for="last-name">URL</label>
+                            <input type="url" id="url" required placeholder="Enter the URL here">
+                        </li>                                              
+                        <li>
+                            <label for="notes">Notes</label>
+                            <textarea rows="6" id="notes" placeholder="Add some notes..."></textarea>
+                        </li>                       
+                        <li>
+                            <button type="submit">Submit</button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </section>
     </main>
 </body>
 <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
