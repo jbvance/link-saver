@@ -213,6 +213,7 @@ function displayLinks(links) {
     return `<div class="link-row">
     <div class="favicon"><img src=${favIcon}></div>
     <div class="url-text"><a href="${link.url}">${title}</a></div>
+    <div><button class="btn btn-primary js-btn-edit" data-id="${link._id}">Edit</button></div>
   </div>`
   }).join('\n');
   $('.js-links-container').html(strHtml);

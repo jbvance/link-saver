@@ -102,6 +102,39 @@
   .active {
     display: block;
   }
+
+  .btn {
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
+
+  .btn-primary {
+    color: #fff;
+    background-color: rgb(92,184,92);;
+    border-color: rgb(92,184,92);
+}
+
+.btn:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+.url-text a {
+  text-decoration: none;
+  color: rgba(0,0,0,0.7);
+}
   
   @media screen and (min-width: 768px) {
     .navbar {
