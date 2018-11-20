@@ -35,6 +35,11 @@
     <main role="main">
         <div class="alert alert-danger js-error">            
         </div>
+
+        <section role="region" class="container js-master-container">
+
+        </section>
+        
         <section role="region" class="js-login-container">
             <div class="logo">Login</div>
             <div class="login-item">
@@ -61,9 +66,9 @@
         <section class="links-container js-links-container">
             
         </section>
-        <section class="js-edit-add-container">
-            <div class="container">
+        <section role="region" class="container js-edit-add-container">            
                 <form class="js-edit-add-form">
+                    <input type="hidden" id="mode" value="">
                     <ul class="flex-outer">
                         <li>
                             <label for="title">Title</label>
@@ -78,11 +83,17 @@
                             <textarea rows="6" id="notes" placeholder="Add some notes..."></textarea>
                         </li>                       
                         <li>
-                            <button type="submit">Submit</button>
+                            <ul class="flex-inner button-row">                                
+                                <li>
+                                    <button type="submit">Submit</button>
+                                </li>
+                                <li>
+                                    <button type="button" onclick="showLinksDiv()">Cancel</button>
+                                </li>
+                            </ul>                                                        
                         </li>
                     </ul>
-                </form>
-            </div>
+                </form>        
         </section>
     </main>
 </body>

@@ -136,6 +136,11 @@
   text-decoration: none;
   color: rgba(0,0,0,0.7);
 }
+
+.js-edit-add-container, .js-links-container, .js-login-container {
+  display: none;
+}
+
   
   @media screen and (min-width: 768px) {
     .navbar {
@@ -298,10 +303,12 @@
   }
   
   
-  .flex-inner {
+  /* .flex-inner {
     padding: 0 8px;
     justify-content: space-between;  
-  }
+  } */
+
+  
   
   .flex-outer > li:not(:last-child) {
     margin-bottom: 20px;
@@ -349,4 +356,9 @@
   
   .flex-inner li {
     width: 100px;
+  }
+
+  .button-row{    
+    padding: 0 8px;
+    justify-content: flex-end;  
   }

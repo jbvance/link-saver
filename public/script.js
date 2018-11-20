@@ -44,6 +44,7 @@ function watchLoginForm() {
         saveLink(sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
         .then(() => {
           clearLinkToSave();
+          showLinks();
         })
         .catch(err => { throw new Error( err.message )});
       }
@@ -85,6 +86,7 @@ function saveLink(url, category) {
       })
       .catch(err => {
         console.error(err);
+        showError(err.message);
         reject(err);
       })
   });
@@ -125,22 +127,31 @@ function getUrlToSave(url = null) {
 }
 
 function createLinkOnLoad() {
-  console.log("createLinkOnLoad");
-  const url = sessionStorage.getItem('urlToSave');
-  console.log("url", url);
-  if (url) {
-    saveLink(url, sessionStorage.getItem('category'))
-    .then((link) => {
-      console.log("LINK", link.data);
-      state.links.push(link.data);
-      //clear out sessionStorage
-      clearLinkToSave();
-    })
-    .catch(err => {
-      console.error(err);   
-      showError(err);   
-    })
-  }
+  return new Promise((resolve, reject) => {
+    // Only execute if user is logged in when the page loads.
+    // Otherwise, user needs to log in and the link in the query param will be saved 
+    // upon a successful login
+    if (!isLoggedIn) return resolve();    
+
+    const url = sessionStorage.getItem('urlToSave');
+    console.log("url", url);
+    if (url) {
+      saveLink(url, sessionStorage.getItem('category'))
+        .then((link) => {
+          console.log("LINK", link.data);
+          //clear out sessionStorage
+          clearLinkToSave();
+          resolve();
+        })
+        .catch(err => {
+          console.error(err);
+          showError(err);
+          reject(err);
+        });
+    } else { 
+      resolve();
+    }
+  });
 }
 
 function clearLinkToSave() {
@@ -160,21 +171,29 @@ function hideError() {
   $('.js-error').hide();
 }
 
-function showLoggedIn() {
-  if (!isLoggedIn()) {
-    $('.js-login-container').show();
-    $('.js-links-container').hide();
-  } 
+function showStartup() { 
+  if (!isLoggedIn()) {    
+    showLogin();        
+  } else {   
+    showLinks();    
+  }
 }
 
 function isLoggedIn() {   
   return !!sessionStorage.getItem('jwt');
 }
 
+function showLogin() {
+  $('.js-links-container').hide();
+  $('.js-edit-add-container').hide();
+  $('.js-login-container').show();
+  
+}
+
 
 function getLinks() {
   return new Promise((resolve, reject) => {
-    if (!isLoggedIn) return '';
+    if (!isLoggedIn) return [];
     const token = sessionStorage.getItem('jwt');
     fetch('api/links', {
         method: 'GET',
@@ -221,9 +240,12 @@ function displayLinks(links) {
   $('.js-links-container').html(strHtml);
 }
 
-function showLinksOnLoad() {
+function showLinks() {
   getLinks()
-  .then(links => displayLinks(links));
+  .then(links => {
+    displayLinks(links)
+    showLinksDiv();
+  });
 }
 
 function modifyButtonsHandler() {
@@ -239,24 +261,57 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditForm(id) {
-  // $('js-error').hide();
-  // $('js-links-container').hide();
-  // $('js-login-container').hide();
-  const linkToEdit = state.links.find(link => link._id === id);
-  console.log('linkToEdit', linkToEdit);
-
-
+function showEditAddForm() { 
+  console.log('showEditAddForm');
+  $('.js-links-container').hide();
+  $('.js-login-container').hide();
+  $('.js-edit-add-container').show();
 }
 
-function initApp() {
-  showLoggedIn();
+function showLinksDiv() {  
+  $('.js-login-container').hide();
+  $('.js-edit-add-container').hide();
+  $('.js-links-container').show();
+}
+
+function showEditForm(id) { 
+  const linkToEdit = state.links.find(link => link._id === id);
+  $('.js-edit-add-form').find('#mode').val('edit');
+  console.log('linkToEdit', linkToEdit);
+  showEditAddForm();
+}
+
+function showAddForm() {
+  $('.js-edit-add-form').find('#mode').val('add');
+  showEditAddForm();  
+}
+
+function watchEditAddForm() {
+  $('.js-edit-add-form').submit(function (e) {
+    hideError();
+    console.log("SUBMIT");
+    e.preventDefault();
+    console.log($('.js-edit-add-container').html());
+    const title = $(this).find('#title').val();
+    const url = $(this).find('#url').val();
+    const notes = $(this).find('#notes').val();
+    const mode = $(this).find('#mode').val();
+    console.log('MODE', mode);    
+  })
+}
+
+function initApp() {  
   getUrlToSave();
-  createLinkOnLoad();
   setupMenu();
   watchLoginForm();
-  showLinksOnLoad();
+  watchEditAddForm();  
   modifyButtonsHandler();
+  createLinkOnLoad()
+  .then(() => {
+    console.log("DONE")
+    showStartup();
+  })
+  
 }
 
 $(initApp);
