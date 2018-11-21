@@ -261,17 +261,18 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditAddForm(link) { 
+function showEditAddForm(link = null) { 
   console.log('showEditAddForm');
   $('.js-links-container').hide();
   $('.js-login-container').hide();
   $('.js-edit-add-container').show();
 
   const form = $('.js-edit-add-form');
-  form.find('#title').val(link.title);
-  form.find('#url').val(link.url);
-  form.find('#notes').val(link.notes);
-
+  if (link) {
+    form.find('#title').val(link.title);
+    form.find('#url').val(link.url);
+    form.find('#notes').val(link.notes);
+  }
 
 }
 
