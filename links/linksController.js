@@ -1,4 +1,5 @@
 const urlRegex = require('url-regex');
+const mongoose = require('mongoose');
 const {
     getTitle,
     getLogo, 
@@ -61,9 +62,9 @@ exports.deleteLink = function (req, res) {
 exports.updateLink = async function(req, res) {    
     const id = req.params.id;
     const userId = req.user.id;
-    let link, user
+    let link
 
-    const requiredFields = ['url', 'title', 'note'];
+    const requiredFields = ['url', 'title', 'note', 'category'];
     const missingField = requiredFields.find(field => !(field in req.body));
 
     if (missingField) {
@@ -110,8 +111,22 @@ exports.createLink = async function (req, res) {
         });
     }
 
+    let categoryExists = false;    
     const url = req.body.url;
-    const catToFind = req.body.category || 'none';
+    let catToFind = null;
+    
+    if (req.body.category) {
+        const bodCategory = req.body.category;        
+        const catObjectId = mongoose.Types.ObjectId.isValid(bodCategory) ? new mongoose.Types.ObjectId(bodCategory) : '';
+        if (bodCategory.toString() === catObjectId.toString()) {
+            // user has passed in an existing catgory ObjectId as opposed to a string to use as the category name            
+            categoryExists = true;            
+        } else {
+            catToFind = bodCategory;
+        }
+    } else {
+        catToFind = 'none';
+    }
 
     // verify user exists    
     const user = await User.findById(req.user.id);
@@ -141,10 +156,15 @@ exports.createLink = async function (req, res) {
 
     try {        
         title = req.body.title || await promiseTimeout(1000, getTitle(url));        
-        favIcon = await promiseTimeout(1000, getLogo(url));            
-        category = await Category.findOne({
-            name: catToFind.toLowerCase()
-        });       
+        favIcon = await promiseTimeout(1000, getLogo(url));   
+        if (categoryExists) {
+            category = await Category.findById(req.body.category);
+            if (!category) catToFind = 'none'; // if an invalid objectID for category was passed in, default the category to 'none'
+        } else {
+            category = await Category.findOne({
+                name: catToFind.toLowerCase()
+            }); 
+        }                    
         if (!category) {                                 
             category = await Category.create({
                 name: catToFind.toLowerCase(),
@@ -157,7 +177,7 @@ exports.createLink = async function (req, res) {
             user: req.user.id,
             title,
             favIcon
-        });
+        });        
         if (link) {
             return res.status(201).json({
                 data: link

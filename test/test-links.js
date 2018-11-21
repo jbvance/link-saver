@@ -3,6 +3,7 @@ global.DATABASE_URL = 'mongodb://localhost/jwt-auth-demo-test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const {app, runServer, closeServer} = require('../server');
 const {User} = require('../users');
@@ -334,28 +335,27 @@ describe('/api/links', function() {
         const updates = {
           title: 'updated title',
           url: 'https://www.cnn.com',
-          note: 'updated note'
+          note: 'updated note',
+          category: mongoose.Types.ObjectId()
         }             
         return Link.create(testLink)
-        .then(link => {         
+        .then(link => {                         
           return chai
           .request(app)
           .put(`/api/links/${link._id.toString()}`)
           .set('authorization', `Bearer ${token}`)    
-          .send(updates)                         
+          .send(updates)                      
           .then((res) => {          
             response = res;
             return Link.findById(link._id.toString());
           })
-          .then(updatedLink => {   
-            const { title, url, note } = response.body.data;
+          .then(() => {   
+            const { title, url, note, category } = response.body.data;
             expect(response.body.data).to.be.an('object');  
             expect(title).to.equal(updates.title);
             expect(url).to.equal(updates.url);
-            expect(note).to.equal(updates.note);                                    
-            expect(updatedLink.title).to.equal(updates.title);
-            expect(updatedLink.url).to.equal(updates.url);
-            expect(updatedLink.url).to.equal(updates.url);            
+            expect(note).to.equal(updates.note);  
+            expect(category).to.equal(updates.category.toString());                                                 
             expect(response).to.have.status(200);
           });
         });       

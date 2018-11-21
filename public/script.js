@@ -24,8 +24,7 @@ function watchLoginForm() {
       method: 'POST',
       headers: new Headers({
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'MY-HEADER': 'https://www.foxnews.com'
+        'Content-Type': 'application/json',       
       }),
       body: JSON.stringify(data)
     })
@@ -42,12 +41,14 @@ function watchLoginForm() {
       //  If the user had entered a url to get to the page and was not yet logged in,
       // go ahead and save the link the user had entered (which should be saved in sessionStorage)
       if (sessionStorage.getItem('urlToSave')) {
-        saveLink(sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
+        saveLink('POST', sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
         .then(() => {
           clearLinkToSave();
           showLinks();
         })
         .catch(err => { throw new Error( err.message )});
+      } else {
+        showLinks();
       }
     })
     .catch(err => {   
@@ -58,17 +59,17 @@ function watchLoginForm() {
 
 }
 
-function saveLink(url, category) {
+function saveLink(httpMethod, url, category = null, linkId = null, title = null, note = null) {
   hideError();
-  return new Promise((resolve, reject) => {
-    console.log('saveLink');
+  return new Promise((resolve, reject) => {    
     if (!sessionStorage.getItem('jwt')) {
       console.error('You must be logged in to save a link');
+      showLogin();
       return reject('You  must be logged in to save a link. Please log in below.');
     }
     const token = sessionStorage.getItem('jwt');
-    fetch('api/links', {
-        method: 'POST',
+    fetch(`api/links/${linkId || ''}`, {
+        method: httpMethod,
         headers: new Headers({
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -76,12 +77,19 @@ function saveLink(url, category) {
         }),
         body: JSON.stringify({
           url,
-          category
+          category,
+          title,
+          note
         })
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error ('Unable to save link. Please try again');
+        }        
+        return res.json()
+      })
       .then(resJson => {
-        console.log("RETURN", resJson);
+        console.log("RETURN JSON", resJson);
         resolve(resJson);
       })
       .catch(err => {
@@ -90,7 +98,6 @@ function saveLink(url, category) {
         reject(err);
       })
   });
-
 }
 
  // user presmumably got here via entering link to save in URL bar and hit enter
@@ -136,7 +143,7 @@ function createLinkOnLoad() {
     const url = sessionStorage.getItem('urlToSave');
     console.log("url", url);
     if (url) {
-      saveLink(url, sessionStorage.getItem('category'))
+      saveLink('POST', url, sessionStorage.getItem('category'))
         .then((link) => {
           console.log("LINK", link.data);
           //clear out sessionStorage
@@ -207,7 +214,7 @@ function getLinks() {
       .then(resJson => {
         console.log("LINKS", resJson);
         state.links = resJson.data;
-        state.categories = getCategories(state.links);
+        state.categories = getCategories();
         resolve(resJson.data)
       })
       .catch(err => {
@@ -218,15 +225,28 @@ function getLinks() {
 }
 
 function getCategories(links) {
-  const tmp = [];
-  links.forEach(link => {
-   const category = tmp.find(cat => cat._id === link.category._id);
-   if (!category) {
-    tmp.push(link.category);
-   }   
-  });
-  console.log("CATEGORIES", tmp);
-  return tmp;
+  return new Promise((resolve, reject) => {
+    if (!isLoggedIn) return [];
+    const token = sessionStorage.getItem('jwt');
+    fetch('api/categories', {
+        method: 'GET',
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }),
+      })
+      .then(res => res.json())
+      .then(resJson => {
+        console.log("CATEGORIES", resJson);
+        state.categories = resJson.data;        
+        resolve(resJson.data)
+      })
+      .catch(err => {
+        console.error(err);
+        reject(err);
+      });
+  })
 }
 
 //validates a given url
@@ -253,9 +273,14 @@ function displayLinks(links) {
 }
 
 function showLinks() {
+  let links;
   getLinks()
-  .then(links => {
-    displayLinks(links)
+  .then(tmpLinks => {
+    links = tmpLinks;
+    return getCategories()
+  })  
+  .then(() => {
+    displayLinks(links);
     showLinksDiv();
   })
   .catch(err => {
@@ -282,19 +307,31 @@ function showEditAddForm(link = null) {
   $('.js-edit-add-container').show();
 
   const form = $('.js-edit-add-form');
+  let categoryOptions = '';
   let linkCategory = '';
+
   if (link) {
     form.find('#title').val(link.title);
     form.find('#url').val(link.url);
-    form.find('#notes').val(link.notes);
+    form.find('#note').val(link.note);
     linkCategory = link.category._id;    
-  }
+  }  
 
   //console.log("state.categories", state.categories);
-  const categories = state.categories.map(category => {
+  categoryOptions += state.categories.map(category => {
     return `<option value="${category._id}"${linkCategory === category._id ? ' selected ' : ''}>${category.name}</option>`
-  }).join('\n');  
-  form.find('#categories').html(categories);
+  }).join('\n');    
+
+  // If no link parameter is present, user is adding a new link.
+  // We need to add a default if 'none' is not already present in the list of categories for this user
+  if (!link) {
+    const noneCategory = state.categories.find(category => category.name.toLowerCase() === 'none');
+    if (!noneCategory) {
+      categoryOptions += `<option value="none" ${!link ? 'selected ' : ''}>none</option>`
+    }
+  }
+
+  form.find('#category').html(categoryOptions);
 }
 
 function showLinksDiv() {  
@@ -302,7 +339,7 @@ function showLinksDiv() {
   $('.js-edit-add-container').hide();
   $('.js-links-container').show();
 }
-
+ 
 function showEditForm(id) { 
   const linkToEdit = state.links.find(link => link._id === id);
   $('.js-edit-add-form').find('#mode').val('edit');
@@ -320,14 +357,28 @@ function watchEditAddForm() {
   $('.js-edit-add-form').submit(function (e) {
     hideError();
     console.log("SUBMIT");
-    e.preventDefault();
-    console.log($('.js-edit-add-container').html());
+    e.preventDefault();    
     const title = $(this).find('#title').val();
     const url = $(this).find('#url').val();
-    const notes = $(this).find('#notes').val();
+    const note = $(this).find('#note').val();
+    const category = $(this).find('#category').val();
     const mode = $(this).find('#mode').val();
-    console.log('MODE', mode);    
-  })
+    const linkId = $(this).find('#linkId').val();
+    let httpMethod = null;
+    if (mode === 'edit') {
+      httpMethod = 'PUT';
+    } else if (mode === 'add') {
+      httpMethod = 'POST';
+    }
+    console.log('MODE', mode);   
+    saveLink(httpMethod, url, category, linkId, title, note)
+    .then(res => {      
+      showLinks();
+    })
+    .catch(err => {
+      showError(`Unable to save link - ${err.message}`);
+    });
+  });
 }
 
 function initApp() {  
