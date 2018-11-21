@@ -261,11 +261,18 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditAddForm() { 
+function showEditAddForm(link) { 
   console.log('showEditAddForm');
   $('.js-links-container').hide();
   $('.js-login-container').hide();
   $('.js-edit-add-container').show();
+
+  const form = $('.js-edit-add-form');
+  form.find('#title').val(link.title);
+  form.find('#url').val(link.url);
+  form.find('#notes').val(link.notes);
+
+
 }
 
 function showLinksDiv() {  
@@ -277,8 +284,9 @@ function showLinksDiv() {
 function showEditForm(id) { 
   const linkToEdit = state.links.find(link => link._id === id);
   $('.js-edit-add-form').find('#mode').val('edit');
+  $('.js-edit-add-form').find('#linkId').val(linkToEdit._id);
   console.log('linkToEdit', linkToEdit);
-  showEditAddForm();
+  showEditAddForm(linkToEdit);
 }
 
 function showAddForm() {
@@ -310,8 +318,7 @@ function initApp() {
   .then(() => {
     console.log("DONE")
     showStartup();
-  })
-  
+  })  
 }
 
 $(initApp);
