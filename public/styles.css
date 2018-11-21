@@ -32,9 +32,20 @@
     display: none;
   } */
 
+  .test {
+    border: 1px solid red;
+  }
+
+  .master-container {
+    display: flex;
+    flex-direction: column;
+  }
+
   .links-container {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column; 
+    flex-grow: 1;
+    border: 1px solid blue;   
   }
 
   .link-row {
@@ -44,6 +55,16 @@
     align-items: center;
     min-height: 50px;
     padding: 10px;
+    border-bottom: 1px solid #808080
+  }
+
+  .link-row__button-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .link-row__button {
+    margin: 5px;
   }
 
   .favicon {
@@ -143,6 +164,12 @@
 
   
   @media screen and (min-width: 768px) {
+
+    .master-container {
+      display: flex;
+      flex-direction: row;
+    }
+
     .navbar {
       display: flex;
       justify-content: space-between;
@@ -178,7 +205,12 @@
     .nav-links:hover {
       color: rgba(255, 255, 255, 1);
     }
-  }
+
+    .link-row__button-row {
+      display: flex;
+      flex-direction: row;
+    }
+  } /* END MEDIA QUERY */
 
   .login-container {
     

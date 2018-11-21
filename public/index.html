@@ -34,34 +34,37 @@
     </nav>
     <main role="main">
         <div class="alert alert-danger js-error"></div>
-               
-        <section role="region" class="js-login-container">
-            <div class="logo">Login</div>
-            <div class="login-item">
-                <form class="form form-login js-form-login">
-                    <div class="form-field">
-                        <label class="user" for="username"><span class="hidden">Username</span></label>
-                        <input id="username" name="username" type="text" class="form-input" placeholder="Username"
-                            required>
-                    </div>
-
-                    <div class="form-field">
-                        <label class="lock" for="password"><span class="hidden">Password</span></label>
-                        <input id="password" name="password" type="password" class="form-input" placeholder="Password"
-                            required>
-                    </div>
-
-                    <div class="form-field">
-                        <input type="submit" value="Log in">
-                    </div>
-                </form>
+        <div class="master-container">
+            <div class="test">
+                <div>Your Categories:</div>
+                <div class="categories"></div>
             </div>
-
-        </section>
-        <section class="links-container js-links-container">
-            
-        </section>
-        <section role="region" class="container js-edit-add-container">            
+            <section role="region" class="js-login-container">
+                <div class="logo">Login</div>
+                <div class="login-item">
+                    <form class="form form-login js-form-login">
+                        <div class="form-field">
+                            <label class="user" for="username"><span class="hidden">Username</span></label>
+                            <input id="username" name="username" type="text" class="form-input" placeholder="Username" required>
+                        </div>
+        
+                        <div class="form-field">
+                            <label class="lock" for="password"><span class="hidden">Password</span></label>
+                            <input id="password" name="password" type="password" class="form-input" placeholder="Password"
+                                required>
+                        </div>
+        
+                        <div class="form-field">
+                            <input type="submit" value="Log in">
+                        </div>
+                    </form>
+                </div>
+        
+            </section>
+            <section class="links-container js-links-container">
+        
+            </section>
+            <section role="region" class="container js-edit-add-container">
                 <form class="js-edit-add-form">
                     <input type="hidden" id="mode" value="">
                     <input type="hidden" id="linkId" value="">
@@ -73,7 +76,7 @@
                         <li>
                             <label for="url">URL</label>
                             <input type="url" id="url" required placeholder="Enter the URL here">
-                        </li>                                              
+                        </li>
                         <li>
                             <label for="note">Note</label>
                             <textarea rows="6" id="note" placeholder="Add some notes..."></textarea>
@@ -81,20 +84,22 @@
                         <li>
                             <label for="category">Category</label>
                             <select id="category"></select>
-                        </li>                         
+                        </li>
                         <li>
-                            <ul class="flex-inner button-row">                                
+                            <ul class="flex-inner button-row">
                                 <li>
                                     <button type="submit">Submit</button>
                                 </li>
                                 <li>
                                     <button type="button" onclick="showLinksDiv()">Cancel</button>
                                 </li>
-                            </ul>                                                        
+                            </ul>
                         </li>
                     </ul>
-                </form>        
-        </section>
+                </form>
+            </section>
+        </div>
+        
     </main>
 </body>
 <script type="text/javascript" src="jquery-3.3.1.min.js"></script>

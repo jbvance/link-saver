@@ -151,8 +151,7 @@ function createLinkOnLoad() {
           resolve();
         })
         .catch(err => {
-          console.error(err);
-          showError(err);
+          console.error(err);          
           reject(err);
         });
     } else { 
@@ -263,9 +262,9 @@ function displayLinks(links) {
     return `<div class="link-row">
     <div class="favicon"><img src=${favIcon}></div>
     <div class="url-text"><a href="${link.url}">${title}</a></div>
-    <div>
-      <button class="btn btn-primary js-btn-edit" data-id="${link._id}" data-mode="edit">Edit</button>
-      <button class="btn btn-primary js-btn-delete" data-id="${link._id}" data-mode="delete">Delete</button>
+    <div class="link-row__button-row">
+      <button class="btn btn-primary link-row__button js-btn-edit" data-id="${link._id}" data-mode="edit">Edit</button>
+      <button class="btn btn-primary link-row__button js-btn-delete" data-id="${link._id}" data-mode="delete">Delete</button>
       </div>
   </div>`
   }).join('\n');
@@ -296,7 +295,7 @@ function modifyButtonsHandler() {
     if (elem.data('mode') === 'edit') {
       showEditForm(elem.data('id'));
     } else if (elem.data('mode') === 'delete') {
-      console.log('DELETE MODE');
+      deleteLink(elem.data('id'));
     }
   });
 }
@@ -314,11 +313,15 @@ function showEditAddForm(link = null) {
     form.find('#title').val(link.title);
     form.find('#url').val(link.url);
     form.find('#note').val(link.note);
-    linkCategory = link.category._id;    
+    // when getLinks is initially called, category comes back as an object.
+    // On updates, only the _id of the category gets sent back
+    linkCategory = link.category._id || link.category;
+    console.log('linkCategory', linkCategory);  
   }  
 
-  //console.log("state.categories", state.categories);
-  categoryOptions += state.categories.map(category => {
+  //console.log("state.categories", state.categories); 
+  categoryOptions += state.categories.map(category => {   
+    if (category._id === linkCategory) console.log("FOUND IT");
     return `<option value="${category._id}"${linkCategory === category._id ? ' selected ' : ''}>${category.name}</option>`
   }).join('\n');    
 
@@ -372,13 +375,56 @@ function watchEditAddForm() {
     }
     console.log('MODE', mode);   
     saveLink(httpMethod, url, category, linkId, title, note)
-    .then(res => {      
-      showLinks();
+    .then(res => {
+      updateLinkStateAfterSave(res.data);
+      displayLinks(state.links);
+      showLinksDiv();
     })
     .catch(err => {
       showError(`Unable to save link - ${err.message}`);
     });
   });
+}
+
+function updateLinkStateAfterSave(link) {
+  console.log("LINK TO CHANGE", link);
+  const index  = state.links.findIndex(search => search._id === link._id)
+  if (index > -1) {
+    state.links[index] = link;
+  } else {
+    console.error('Unable to locate link in state for update');
+  }
+}
+
+function deleteLink(id) {
+
+  if (!confirm('Are you sure you want to delete this link?')) return;
+
+  const token = sessionStorage.getItem('jwt');
+  fetch(`api/links/${id}`, {
+      method: 'DELETE',
+      headers: new Headers({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }),
+    })   
+    .then((res) => {
+      if (res.status !== 204) {
+        throw new Error('Unable to delete link');
+      }
+      const delIndex = state.links.findIndex(link => link._id === id);
+      if (delIndex > -1) {
+        state.links.splice(delIndex, 1);
+        displayLinks(state.links);
+      } else {
+        throw new Error ('Could not find link to delete');
+      }
+    })
+    .catch(err => {
+      console.error(err.message);
+      showError('Unable to delete link.');
+    })
 }
 
 function initApp() {  
@@ -388,10 +434,12 @@ function initApp() {
   watchEditAddForm();  
   modifyButtonsHandler();
   createLinkOnLoad()
-  .then(() => {
-    console.log("DONE")
+  .then(() => {   
     showStartup();
-  })  
+  })
+  .catch(err => {
+    showError(err.message);
+  })
 }
 
 $(initApp);
