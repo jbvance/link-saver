@@ -78,7 +78,7 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
         body: JSON.stringify({
           url,
           category,
-          title,
+          title: title || url,
           note
         })
       })
