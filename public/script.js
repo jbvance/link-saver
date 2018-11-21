@@ -1,5 +1,6 @@
-const state = {  
-  links: []
+let state = {  
+  links: [],
+  categories: []
 };
 
 function setupMenu() {
@@ -50,8 +51,7 @@ function watchLoginForm() {
       }
     })
     .catch(err => {   
-      $('.js-error').text(err.message);;
-      $('.js-error').show();  
+      showError(`Unable to login - ${err.message}`);  
       console.error(err.message);
     });
   })
@@ -207,6 +207,7 @@ function getLinks() {
       .then(resJson => {
         console.log("LINKS", resJson);
         state.links = resJson.data;
+        state.categories = getCategories(state.links);
         resolve(resJson.data)
       })
       .catch(err => {
@@ -214,7 +215,18 @@ function getLinks() {
         reject(err);
       });
   })
+}
 
+function getCategories(links) {
+  const tmp = [];
+  links.forEach(link => {
+   const category = tmp.find(cat => cat._id === link.category._id);
+   if (!category) {
+    tmp.push(link.category);
+   }   
+  });
+  console.log("CATEGORIES", tmp);
+  return tmp;
 }
 
 //validates a given url
@@ -245,6 +257,9 @@ function showLinks() {
   .then(links => {
     displayLinks(links)
     showLinksDiv();
+  })
+  .catch(err => {
+    showError(`Unable to get links for display - ${err.message}`);
   });
 }
 
@@ -261,19 +276,25 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditAddForm(link = null) { 
-  console.log('showEditAddForm');
+function showEditAddForm(link = null) {   
   $('.js-links-container').hide();
   $('.js-login-container').hide();
   $('.js-edit-add-container').show();
 
   const form = $('.js-edit-add-form');
+  let linkCategory = '';
   if (link) {
     form.find('#title').val(link.title);
     form.find('#url').val(link.url);
     form.find('#notes').val(link.notes);
+    linkCategory = link.category._id;    
   }
 
+  //console.log("state.categories", state.categories);
+  const categories = state.categories.map(category => {
+    return `<option value="${category._id}"${linkCategory === category._id ? ' selected ' : ''}>${category.name}</option>`
+  }).join('\n');  
+  form.find('#categories').html(categories);
 }
 
 function showLinksDiv() {  
