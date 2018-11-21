@@ -6,6 +6,6 @@ deploy:
   provider: heroku
   api_key:
     secure: CW9hTvfi7MCu1WblxKYiVCB3JkDQmEVpC7tnEMras55xYgGtBWOfm9IPuOErRk7VhoVuZnLvGw8D1Y/fGk5E/gcZNMbTCdvK46X2TzSGd5ANfa5SC7BRB2ht2le0w9Cmyr++kow+PMpegoqwkaRhpuVZTIzFp0D0g27ycZ9zdoROL6j8B8uniktD18gy7no00rfsdbVVHl7dbBZUNSJqXkfVbntmgqvPYl0iZ3q7+EvpDjfvn/COSPTeFyRFmMjjSAvHPikxMffQvc52bu2OQAbGQ94oQMExZ3lGCe+jpdt0Tre2w8eLSa60sMXSP288DU19B/m7Q5JbHLFbEdwlAkV5X3MsA3/u8HAwZGXgwuLrVGKwtEwRTMMikY5IaNKX6kpTE0GKcno1gluFO6e0W4HhgspufU1nsPGFG1QbXFGXLjSZRovAHzL43jN2vtTm+NRxNOgjsEXdBP7icI6tQ8w5JAYHTsg74OBtQxcXg/2adevMIBNaQutRX5z+QB+J9IYxOasU6ptmKWfaOHehOFrkNNsit1KFyBUuB8b/JgQyO+5klWrJnFWqfwdZUv2lMr/LqNRVgZH30HdnsMGP5h8rTdpaV/jahp89AQJVwgJ6+QBPqRPZzhYJVipiMaSchXNYeNWT4ANrpZ/zalAmiJ+USONjtvQUhYKGiTWI5k4=
-  app: vance-linksaver-dev-server
+  app: bookmarker-jv
   on:
     repo: jbvance/link-saver
