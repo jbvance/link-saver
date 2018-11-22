@@ -155,7 +155,7 @@ exports.createLink = async function (req, res) {
     let category, link, title, favIcon;
 
     try {        
-        title = req.body.title || await promiseTimeout(1000, getTitle(url));        
+        title = req.body.title || await promiseTimeout(1000, getTitle(url)) || url;        
         favIcon = await promiseTimeout(1000, getLogo(url));   
         if (categoryExists) {
             category = await Category.findById(req.body.category);
