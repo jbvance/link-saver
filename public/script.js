@@ -65,7 +65,7 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
     if (!sessionStorage.getItem('jwt')) {
       console.error('You must be logged in to save a link');
       showLogin();
-      return reject('You  must be logged in to save a link. Please log in below.');
+      throw new Error('You  must be logged in to save a link. Please log in below.');
     }
     const token = sessionStorage.getItem('jwt');
     fetch(`api/links/${linkId || ''}`, {
@@ -93,9 +93,8 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
         resolve(resJson);
       })
       .catch(err => {
-        console.error(err);
-        showError(err.message);
-        reject(err);
+        console.error(err);        
+        reject({message: err.message});
       })
   });
 }
@@ -303,7 +302,7 @@ function modifyButtonsHandler() {
 function showEditAddForm(link = null) {   
   $('.js-links-container').hide();
   $('.js-login-container').hide();
-  $('.js-edit-add-container').show();
+  $('.js-edit-add-container').fadeIn();
 
   const form = $('.js-edit-add-form');
   let categoryOptions = '';
@@ -315,13 +314,10 @@ function showEditAddForm(link = null) {
     form.find('#note').val(link.note);
     // when getLinks is initially called, category comes back as an object.
     // On updates, only the _id of the category gets sent back
-    linkCategory = link.category._id || link.category;
-    console.log('linkCategory', linkCategory);  
+    linkCategory = link.category._id || link.category;    
   }  
 
-  //console.log("state.categories", state.categories); 
-  categoryOptions += state.categories.map(category => {   
-    if (category._id === linkCategory) console.log("FOUND IT");
+  categoryOptions += state.categories.map(category => {       
     return `<option value="${category._id}"${linkCategory === category._id ? ' selected ' : ''}>${category.name}</option>`
   }).join('\n');    
 
@@ -330,7 +326,7 @@ function showEditAddForm(link = null) {
   if (!link) {
     const noneCategory = state.categories.find(category => category.name.toLowerCase() === 'none');
     if (!noneCategory) {
-      categoryOptions += `<option value="none" ${!link ? 'selected ' : ''}>none</option>`
+      categoryOptions += `<option value="none" ${!link ? ' selected ' : ''}>none</option>`
     }
   }
 
@@ -340,7 +336,7 @@ function showEditAddForm(link = null) {
 function showLinksDiv() {  
   $('.js-login-container').hide();
   $('.js-edit-add-container').hide();
-  $('.js-links-container').show();
+  $('.js-links-container').fadeIn();
 }
  
 function showEditForm(id) { 
@@ -438,6 +434,7 @@ function initApp() {
     showStartup();
   })
   .catch(err => {
+    console.log("CATCHING ERROR", err);
     showError(err.message);
   })
 }
