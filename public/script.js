@@ -15,6 +15,11 @@ function setupMenu() {
     e.preventDefault();
     showAddForm();
   })
+
+  $('.js-show-links').click(function(e) {
+    e.preventDefault();
+    showLinksSection();
+  })
 }
 
 function watchLoginForm() {  
@@ -286,7 +291,7 @@ function showLinks() {
   })  
   .then(() => {
     displayLinks(links);
-    showLinksDiv();
+    showLinksSection();
   })
   .catch(err => {
     showError(`Unable to get links for display - ${err.message}`);
@@ -342,19 +347,18 @@ function showEditAddForm(link = null) {
 }
 
 function showSection(className) {
-  //console.log($('.master-container').children('section'));
-  const sections = $('.master-container').children('section');
-  console.log("SECTIONS", sections);
+  // show the section selected in the master container, and hide the rest
+  const sections = $('.master-container').children('section');  
   sections.each(function (index) {
    if (this.className.includes(className)) {
-     $(this).show();
+     $(this).fadeIn();
    } else {
     $(this).hide();
    }
   })
 }
 
-function showLinksDiv() {  
+function showLinksSection() {  
   showSection('js-links-container');
   // $('.js-login-container').hide();
   // $('.js-edit-add-container').hide();
@@ -399,7 +403,7 @@ function watchEditAddForm() {
     .then(res => {
       updateLinkStateAfterSave(res.data);
       displayLinks(state.links);
-      showLinksDiv();
+      showLinksSection();
     })
     .catch(err => {
       showError(`Unable to save link - ${err.message}`);
