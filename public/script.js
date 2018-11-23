@@ -196,9 +196,10 @@ function isLoggedIn() {
 }
 
 function showLogin() {
-  $('.js-links-container').hide();
-  $('.js-edit-add-container').hide();
-  $('.js-login-container').show();
+  showSection('js-login-container');
+  // $('.js-links-container').hide();
+  // $('.js-edit-add-container').hide();
+  // $('.js-login-container').show();
   
 }
 
@@ -305,10 +306,11 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditAddForm(link = null) {   
-  $('.js-links-container').hide();
-  $('.js-login-container').hide();
-  $('.js-edit-add-container').fadeIn();
+function showEditAddForm(link = null) { 
+  showSection('js-edit-add-container');  
+  // $('.js-links-container').hide();
+  // $('.js-login-container').hide();
+  // $('.js-edit-add-container').fadeIn();
 
   const form = $('.js-edit-add-form');
   let categoryOptions = '';
@@ -339,10 +341,24 @@ function showEditAddForm(link = null) {
   form.find('#category').html(categoryOptions);
 }
 
+function showSection(className) {
+  //console.log($('.master-container').children('section'));
+  const sections = $('.master-container').children('section');
+  console.log("SECTIONS", sections);
+  sections.each(function (index) {
+   if (this.className.includes(className)) {
+     $(this).show();
+   } else {
+    $(this).hide();
+   }
+  })
+}
+
 function showLinksDiv() {  
-  $('.js-login-container').hide();
-  $('.js-edit-add-container').hide();
-  $('.js-links-container').fadeIn();
+  showSection('js-links-container');
+  // $('.js-login-container').hide();
+  // $('.js-edit-add-container').hide();
+  // $('.js-links-container').fadeIn();
 }
  
 function showEditForm(id) { 
@@ -432,8 +448,7 @@ function deleteLink(id) {
     })
 }
 
-function initApp() {  
-  console.log($('.master-container').children('section'));
+function initApp() {   
   getUrlToSave();
   setupMenu();
   watchLoginForm();
