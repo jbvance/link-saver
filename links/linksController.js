@@ -109,7 +109,7 @@ exports.createLink = async function (req, res) {
             message: 'Missing field',
             location: missingField
         });
-    }
+    }    
 
     let categoryExists = false;    
     const url = req.body.url;
@@ -176,7 +176,8 @@ exports.createLink = async function (req, res) {
             category: category._id,
             user: req.user.id,
             title,
-            favIcon
+            favIcon,
+            note: req.body.note
         });        
         if (link) {
             return res.status(201).json({

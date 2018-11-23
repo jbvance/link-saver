@@ -10,6 +10,11 @@ function setupMenu() {
   navBarToggle.click(function() {
     mainNav.toggleClass('active');
   });
+
+  $('.js-add-new-link').click(function(e)  {
+    e.preventDefault();
+    showAddForm();
+  })
 }
 
 function watchLoginForm() {  
@@ -68,6 +73,7 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
       throw new Error('You  must be logged in to save a link. Please log in below.');
     }
     const token = sessionStorage.getItem('jwt');
+    console.log('NOTE', note);
     fetch(`api/links/${linkId || ''}`, {
         method: httpMethod,
         headers: new Headers({
@@ -235,10 +241,9 @@ function getCategories(links) {
         }),
       })
       .then(res => res.json())
-      .then(resJson => {
-        console.log("CATEGORIES", resJson);
-        state.categories = resJson.data;        
-        resolve(resJson.data)
+      .then(resJson => {               
+        state.categories = resJson.data.sort((a, b) => a.name < b.name ? -1 : (a.name > b.name) ? 1 : 0);              
+        resolve(state.categories);
       })
       .catch(err => {
         console.error(err);
@@ -342,8 +347,7 @@ function showLinksDiv() {
 function showEditForm(id) { 
   const linkToEdit = state.links.find(link => link._id === id);
   $('.js-edit-add-form').find('#mode').val('edit');
-  $('.js-edit-add-form').find('#linkId').val(linkToEdit._id);
-  console.log('linkToEdit', linkToEdit);
+  $('.js-edit-add-form').find('#linkId').val(linkToEdit._id); 
   showEditAddForm(linkToEdit);
 }
 
@@ -369,7 +373,7 @@ function watchEditAddForm() {
     } else if (mode === 'add') {
       httpMethod = 'POST';
     }
-    console.log('MODE', mode);   
+    console.log('MODE', mode);      
     saveLink(httpMethod, url, category, linkId, title, note)
     .then(res => {
       updateLinkStateAfterSave(res.data);
@@ -387,8 +391,8 @@ function updateLinkStateAfterSave(link) {
   const index  = state.links.findIndex(search => search._id === link._id)
   if (index > -1) {
     state.links[index] = link;
-  } else {
-    console.error('Unable to locate link in state for update');
+  } else { // user has just added a new record, add it to state
+    state.links.push(link);
   }
 }
 
