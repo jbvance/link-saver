@@ -34,32 +34,30 @@
     </nav>
     <main role="main">
         <div class="alert alert-danger js-error"></div>
-        <div class="master-container">
-            <div class="test">
-                <div>Your Categories:</div>
-                <div class="categories"></div>
-            </div>
+        <div class="master-container container">
+            
             <section role="region" class="js-login-container">
-                <div class="logo">Login</div>
-                <div class="login-item">
-                    <form class="form form-login js-form-login">
-                        <div class="form-field">
-                            <label class="user" for="username"><span class="hidden">Username</span></label>
-                            <input id="username" name="username" type="text" class="form-input" placeholder="Username" required>
-                        </div>
-        
-                        <div class="form-field">
-                            <label class="lock" for="password"><span class="hidden">Password</span></label>
-                            <input id="password" name="password" type="password" class="form-input" placeholder="Password"
-                                required>
-                        </div>
-        
-                        <div class="form-field">
-                            <input type="submit" value="Log in">
-                        </div>
-                    </form>
-                </div>
-        
+                <div>Login</div>              
+                    <form class="js-form-login">                        
+                        <ul class="flex-outer">
+                            <li>
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" required placeholder="Username">
+                            </li>
+                            <li>
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" required placeholder="Password">
+                            </li>                        
+                            <li>
+                                <ul class="flex-inner button-row">
+                                    <li>
+                                        <button type="submit">Submit</button>
+                                    </li>                              
+                                </ul>
+                            </li>
+                        </ul>
+                    </form>               
+            
             </section>
             <section class="links-container js-links-container">
         

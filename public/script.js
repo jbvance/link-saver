@@ -25,6 +25,7 @@ function watchLoginForm() {
     const username = $(this).find('input[name=username]').val();
     const password = $(this).find('input[name=password]').val();
     const data = { username, password }
+    console.log('LOGIN INFO', data);
     fetch('api/auth/login', {
       method: 'POST',
       headers: new Headers({
@@ -353,6 +354,10 @@ function showEditForm(id) {
 
 function showAddForm() {
   $('.js-edit-add-form').find('#mode').val('add');
+  $('.js-edit-add-form').find('#title').val('');
+  $('.js-edit-add-form').find('#url').val('');
+  $('.js-edit-add-form').find('#note').val('');
+  $('.js-edit-add-form').find('#category').val('');
   showEditAddForm();  
 }
 
@@ -428,6 +433,7 @@ function deleteLink(id) {
 }
 
 function initApp() {  
+  console.log($('.master-container').children('section'));
   getUrlToSave();
   setupMenu();
   watchLoginForm();
