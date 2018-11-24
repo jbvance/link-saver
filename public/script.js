@@ -375,10 +375,7 @@ function modifyButtonsHandler() {
 }
 
 function showEditAddLinkForm(link = null) { 
-  showSection('js-edit-add-container');  
-  // $('.js-links-container').hide();
-  // $('.js-login-container').hide();
-  // $('.js-edit-add-container').fadeIn();
+  showSection('js-edit-add-container');    
 
   const form = $('.js-edit-add-form');
   let categoryOptions = '';
@@ -487,6 +484,12 @@ function showEditCategoryForm(id) {
   showEditAddCategoryForm(catToEdit);
 }
 
+function showAddCategoryForm(id) {   
+  $('.js-edit-add-category-form').find('#mode').val('add');
+  $('.js-edit-add-category-form').find('#categoryId').val(''); 
+  showEditAddCategoryForm();
+}
+
 function watchEditAddLinkForm() {
   $('.js-edit-add-form').submit(function (e) {
     hideError();
@@ -532,7 +535,7 @@ function updateCategoryStateAfterSave(category) {
   if (index > -1) {
     state.categories[index] = category;
   } else { // user has just added a new record, add it to state
-    state.catgories.push(category);
+    state.categories.push(category);
   }
 }
 
@@ -606,7 +609,7 @@ function deleteCategory(id) {
 
 function addNewCategoryHandler() {
   $('.js-new-category').click(function(e) { 
-    console.log('CLICKED');
+    showAddCategoryForm();
   });
 }
 
