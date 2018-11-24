@@ -28,9 +28,9 @@
     border-color: #f5c6cb;
 }
 
-  /* .js-login-container, .js-links-container {
+  .js-login-container, .js-links-container, .js-edit-add-category-container {
     display: none;
-  } */
+  }
 
   .test {
     border: 1px solid red;
@@ -58,12 +58,7 @@
     min-height: 50px;
     padding: 10px;
     border-bottom: 1px solid #808080
-  }
-
-  .link-row:first {
-    border-top: 5px solid red;
-    background-color: blue;
-  }
+  } 
 
 
   .link-row__button-row {
@@ -86,6 +81,7 @@
 
   .url-text {
     flex: 1 1 auto;
+    cursor: pointer;
   }
   
   .navbar {

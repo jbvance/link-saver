@@ -1,4 +1,5 @@
 const { Category } = require('./models');
+const { Link } = require('../links/models');
 
 exports.createCategory = async function(req, res) {        
 
@@ -37,6 +38,14 @@ exports.deleteCategory = async function(req, res) {
             reason: 'ValidationError',
             message: 'Missing field',
             location: 'id'
+        });
+    }
+
+    // Do not allow delete if there are links associated with this category
+    const link = await Link.findOne( { category: req.params.id });
+    if (link) {
+        return res.status(422).json({
+            message:'Unable to delete category. There are one or more links associated with that category'
         });
     }
 

@@ -13,7 +13,7 @@ function setupMenu() {
 
   $('.js-add-new-link').click(function(e)  {
     e.preventDefault();
-    showAddForm();
+    showAddLinkForm();
   })
 
   $('.js-show-links').click(function(e) {
@@ -100,8 +100,43 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
         }        
         return res.json()
       })
-      .then(resJson => {
-        console.log("RETURN JSON", resJson);
+      .then(resJson => {       
+        resolve(resJson);
+      })
+      .catch(err => {
+        console.error(err);        
+        reject({message: err.message});
+      })
+  });
+}
+
+function saveCategory(httpMethod, name, categoryId = null) {
+  hideError();
+  return new Promise((resolve, reject) => {    
+    if (!sessionStorage.getItem('jwt')) {
+      console.error('You must be logged in to save a link');
+      showLogin();
+      throw new Error('You  must be logged in to save a link. Please log in below.');
+    }
+    const token = sessionStorage.getItem('jwt');    
+    fetch(`api/categories/${categoryId || ''}`, {
+        method: httpMethod,
+        headers: new Headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }),
+        body: JSON.stringify({
+          name
+        })
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error ('Unable to save category. Please try again');
+        }        
+        return res.json()
+      })
+      .then(resJson => {       
         resolve(resJson);
       })
       .catch(err => {
@@ -225,7 +260,7 @@ function getLinks() {
       .then(resJson => {
         console.log("LINKS", resJson);
         state.links = resJson.data;
-        state.categories = getCategories();
+        //state.categories = getCategories();
         resolve(resJson.data)
       })
       .catch(err => {
@@ -249,8 +284,8 @@ function getCategories(links) {
       })
       .then(res => res.json())
       .then(resJson => {               
-        state.categories = resJson.data.sort((a, b) => a.name < b.name ? -1 : (a.name > b.name) ? 1 : 0);              
-        resolve(state.categories);
+        const sortedCategories = resJson.data.sort((a, b) => a.name < b.name ? -1 : (a.name > b.name) ? 1 : 0);              
+        resolve(sortedCategories);
       })
       .catch(err => {
         console.error(err);
@@ -274,12 +309,27 @@ function displayLinks(links) {
     <div class="favicon"><img src=${favIcon}></div>
     <div class="url-text"><a href="${link.url}">${title}</a></div>
     <div class="link-row__button-row">
-      <button class="btn btn-primary link-row__button js-btn-edit" data-id="${link._id}" data-mode="edit">Edit</button>
-      <button class="btn btn-primary link-row__button js-btn-delete" data-id="${link._id}" data-mode="delete">Delete</button>
+      <button class="btn btn-primary link-row__button js-btn-edit js-btn-edit-link" data-id="${link._id}" data-mode="edit">Edit</button>
+      <button class="btn btn-primary link-row__button js-btn-delete js-btn-delete-link" data-id="${link._id}" data-mode="delete">Delete</button>
       </div>
   </div>`
   }).join('\n');
   $('.js-links-container').html(strHtml);
+}
+
+function displayCategories(categories) { 
+  const strHtml = categories.map(category => {
+    const title = category.name
+    return `<div class="link-row">   
+    <div class="url-text">${category.name}</div>
+    <div class="link-row__button-row">
+      <button class="btn btn-primary link-row__button js-btn-edit js-btn-edit-category" data-id="${category._id}" data-mode="edit">Edit</button>
+      <button class="btn btn-primary link-row__button js-btn-delete js-btn-delete-category" data-id="${category._id}" data-mode="delete">Delete</button>
+      </div>
+  </div>`
+  }).join('\n');
+  $('.js-links-container').html(strHtml);
+  showSection('js-links-container');
 }
 
 function showLinks() {
@@ -289,7 +339,8 @@ function showLinks() {
     links = tmpLinks;
     return getCategories()
   })  
-  .then(() => {
+  .then((categories) => {
+    state.categories = categories;
     displayLinks(links);
     showLinksSection();
   })
@@ -300,18 +351,28 @@ function showLinks() {
 
 function modifyButtonsHandler() {
   // Attach a delegated event handler
-  $( '.js-links-container' ).on( "click", "button", function( event ) {
+  $( '.js-links-container' ).on( "click", "button", function( event ) {    
     event.preventDefault();
-    var elem = $( this );       
+    var elem = $( this );      
+    const className = elem[0].className; 
+    
     if (elem.data('mode') === 'edit') {
-      showEditForm(elem.data('id'));
+      if (className.indexOf('js-btn-edit-link') > -1) {
+        showEditLinkForm(elem.data('id'));
+      } else if (className.indexOf('js-btn-edit-category') > -1) {
+        showEditCategoryForm(elem.data('id'));
+      }
     } else if (elem.data('mode') === 'delete') {
-      deleteLink(elem.data('id'));
+      if (className.indexOf('js-btn-delete-link') > -1) {
+        deleteLink(elem.data('id'));
+      } else if (className.indexOf('js-btn-delete-category') > -1) {
+        deleteCategory(elem.data('id'));
+      }     
     }
   });
 }
 
-function showEditAddForm(link = null) { 
+function showEditAddLinkForm(link = null) { 
   showSection('js-edit-add-container');  
   // $('.js-links-container').hide();
   // $('.js-login-container').hide();
@@ -346,7 +407,18 @@ function showEditAddForm(link = null) {
   form.find('#category').html(categoryOptions);
 }
 
+function showEditAddCategoryForm(category = null) {   
+
+  const form = $('.js-edit-add-category-form');  
+
+  if (category) {
+    form.find('#name').val(category.name);      
+  }     
+  showSection('js-edit-add-category-container');  
+}
+
 function showSection(className) {
+  hideError();
   // show the section selected in the master container, and hide the rest
   const sections = $('.master-container').children('section');  
   sections.each(function (index) {
@@ -365,23 +437,57 @@ function showLinksSection() {
   // $('.js-links-container').fadeIn();
 }
  
-function showEditForm(id) { 
+function showEditLinkForm(id) { 
   const linkToEdit = state.links.find(link => link._id === id);
   $('.js-edit-add-form').find('#mode').val('edit');
   $('.js-edit-add-form').find('#linkId').val(linkToEdit._id); 
-  showEditAddForm(linkToEdit);
+  showEditAddLinkForm(linkToEdit);
 }
 
-function showAddForm() {
+function showAddLinkForm() {
   $('.js-edit-add-form').find('#mode').val('add');
   $('.js-edit-add-form').find('#title').val('');
   $('.js-edit-add-form').find('#url').val('');
   $('.js-edit-add-form').find('#note').val('');
   $('.js-edit-add-form').find('#category').val('');
-  showEditAddForm();  
+  showEditAddLinkForm();  
 }
 
-function watchEditAddForm() {
+function watchEditAddCategoryForm() {
+  $('.js-edit-add-category-form').submit(function (e) {
+    e.preventDefault();
+    hideError();
+    const name = $(this).find('#name').val();;
+    const mode = $(this).find('#mode').val();
+    const categoryId = $(this).find('#categoryId').val();
+    let httpMethod = null;
+    if (mode === 'edit') {
+      httpMethod = 'PUT';
+    } else if (mode === 'add') {
+      httpMethod = 'POST';
+    }
+    console.log('MODE', mode);      
+    saveCategory(httpMethod, name, categoryId)
+    .then(res => {
+      console.log("AFTER saveCategory", res);
+      updateCategoryStateAfterSave(res.data);
+      displayCategories(state.categories);     
+    })
+    .catch(err => {
+      showError(`Unable to save category - ${err.message}`);
+    });
+  });
+
+}
+
+function showEditCategoryForm(id) { 
+  const catToEdit = state.categories.find(cat => cat._id === id);
+  $('.js-edit-add-category-form').find('#mode').val('edit');
+  $('.js-edit-add-category-form').find('#categoryId').val(catToEdit._id); 
+  showEditAddCategoryForm(catToEdit);
+}
+
+function watchEditAddLinkForm() {
   $('.js-edit-add-form').submit(function (e) {
     hideError();
     console.log("SUBMIT");
@@ -421,6 +527,15 @@ function updateLinkStateAfterSave(link) {
   }
 }
 
+function updateCategoryStateAfterSave(category) {  
+  const index  = state.categories.findIndex(search => search._id === category._id)
+  if (index > -1) {
+    state.categories[index] = category;
+  } else { // user has just added a new record, add it to state
+    state.catgories.push(category);
+  }
+}
+
 function deleteLink(id) {
 
   if (!confirm('Are you sure you want to delete this link?')) return;
@@ -452,11 +567,63 @@ function deleteLink(id) {
     })
 }
 
+function deleteCategory(id) {
+  hideError();
+
+  if (!confirm('Are you sure you want to delete this category?')) return;
+
+  const token = sessionStorage.getItem('jwt');
+  fetch(`api/categories/${id}`, {
+      method: 'DELETE',
+      headers: new Headers({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }),
+    })   
+    .then((res) => {
+      return res.json()
+    .then(resJson => {
+        console.log("RESJSON", resJson, res.status);
+        if (res.status !== 200) {
+          console.log("ERROR", res);
+          throw new Error(resJson.message);
+        }
+        const delIndex = state.categories.findIndex(category => category._id === id);
+        if (delIndex > -1) {
+          state.categories.splice(delIndex, 1);
+          displayCategories(state.categories);
+        } else {
+          throw new Error ('Could not find category to delete');
+        }
+      })     
+    })
+    .catch(err => {
+      console.error(err.message);
+      showError(err.message);
+    })
+}
+
+function addNewCategoryHandler() {
+  $('.js-new-category').click(function(e) { 
+    console.log('CLICKED');
+  });
+}
+
+function showCategoriesHandler() {
+  $('.js-show-categories').click(function(e) {
+    displayCategories(state.categories);
+  });
+}
+
 function initApp() {   
   getUrlToSave();
   setupMenu();
   watchLoginForm();
-  watchEditAddForm();  
+  watchEditAddLinkForm(); 
+  watchEditAddCategoryForm(); 
+  addNewCategoryHandler();
+  showCategoriesHandler();
   modifyButtonsHandler();
   createLinkOnLoad()
   .then(() => {   
