@@ -19,7 +19,7 @@ function setupMenu() {
   $('.js-show-links').click(function(e) {
     e.preventDefault();
     displayLinks(state.links);
-    showLinksSection();
+    
   })
 }
 
@@ -162,14 +162,13 @@ function getUrlToSave(url = null) {
     if (split.length > 1) {
         category = decodeURIComponent(split[0].replace(/^\/+/g, ''));
         path = decodeURIComponent(split[1]);
-    } else {
-        console.log("GOT HERE", split[0].replace(/^\/+/g, ''));
+    } else {       
         category = 'none';
         path = decodeURIComponent(split[0].replace(/^\/+/g, ''));
-    }
-    console.log("CAT", category, "PATH", path);
+    }    
     if (!validUrl(path)) {
       console.error('Invalid url');
+      showError('Invalid url');
     } else {
      sessionStorage.setItem('category', category);
      sessionStorage.setItem('urlToSave', path);    
@@ -191,8 +190,7 @@ function createLinkOnLoad() {
     console.log("url", url);
     if (url) {
       saveLink('POST', url, sessionStorage.getItem('category'))
-        .then((link) => {
-          console.log("LINK", link.data);
+        .then((link) => {        
           //clear out sessionStorage
           clearLinkToSave();
           resolve();
@@ -237,11 +235,7 @@ function isLoggedIn() {
 }
 
 function showLogin() {
-  showSection('js-login-container');
-  // $('.js-links-container').hide();
-  // $('.js-edit-add-container').hide();
-  // $('.js-login-container').show();
-  
+  showSection('js-login-container');  
 }
 
 
@@ -303,6 +297,10 @@ function validUrl(url) {
 }
 
 function displayLinks(links) { 
+  hideError();
+  if (!links || links.length < 1) {
+    return showError('No Links to display')
+  }
   const strHtml = links.map(link => {
     const title = link.title || link.url;   
     const favIcon = link.favIcon || '/images/default-icon.png'; 
@@ -316,14 +314,15 @@ function displayLinks(links) {
   </div>`
   }).join('\n');
   $('.js-links-container').html(strHtml);
+  showLinksSection();
 }
 
 function displayCategories(categories = null) {
   if (!categories) categories = state.categories; 
   const strHtml = categories.map(category => {
     const title = category.name
-    return `<div class="link-row">   
-    <div class="url-text">${category.name}</div>
+    return `<div class="link-row">       
+    <div class="url-text js-category-text">${category.name}</div>
     <div class="link-row__button-row">
       <button class="btn btn-primary link-row__button js-btn-edit js-btn-edit-category" data-id="${category._id}" data-mode="edit">Edit</button>
       <button class="btn btn-primary link-row__button js-btn-delete js-btn-delete-category" data-id="${category._id}" data-mode="delete">Delete</button>
@@ -343,8 +342,7 @@ function showLinks() {
   })  
   .then((categories) => {
     state.categories = categories;
-    displayLinks(links);
-    showLinksSection();
+    displayLinks(links);    
   })
   .catch(err => {
     showError(`Unable to get links for display - ${err.message}`);
@@ -430,10 +428,7 @@ function showSection(className) {
 }
 
 function showLinksSection() {  
-  showSection('js-links-container');
-  // $('.js-login-container').hide();
-  // $('.js-edit-add-container').hide();
-  // $('.js-links-container').fadeIn();
+  showSection('js-links-container'); 
 }
  
 function showEditLinkForm(id) { 
@@ -510,9 +505,8 @@ function watchEditAddLinkForm() {
     console.log('MODE', mode);      
     saveLink(httpMethod, url, category, linkId, title, note)
     .then(res => {
-      updateLinkStateAfterSave(res.data);
-      displayLinks(state.links);
-      showLinksSection();
+      updateLinksState(res.data);
+      displayLinks(state.links);      
     })
     .catch(err => {
       showError(`Unable to save link - ${err.message}`);
@@ -520,13 +514,12 @@ function watchEditAddLinkForm() {
   });
 }
 
-function updateLinkStateAfterSave(link) {
-  console.log("LINK TO CHANGE", link);
+function updateLinksState(link) {  
   const index  = state.links.findIndex(search => search._id === link._id)
   if (index > -1) {
     state.links[index] = link;
-  } else { // user has just added a new record, add it to state
-    state.links.push(link);
+  } else { // user has just added a new record, add it to beginning of state
+    state.links.unshift(link);
   }
 }
 
@@ -619,6 +612,21 @@ function showCategoriesHandler() {
   });
 }
 
+function showCategoryLinksHandler() {  
+  // attach delegated event handler
+  $('.js-links-container').on('click', '.js-category-text', function(event) {
+    event.preventDefault();
+    console.log('TEXT', $(this).text());
+    const category = state.categories.find(category => category.name === $(this).text());
+    console.log('CATEGORY', category);
+    const links = state.links.filter(link => {
+      console.log(link.category._id, category._id, link.category._id === category._id);
+      return link.category === category._id || link.category._id === category._id;
+    })
+   displayLinks(links);
+  })
+}
+
 function initApp() {   
   getUrlToSave();
   setupMenu();
@@ -627,13 +635,13 @@ function initApp() {
   watchEditAddCategoryForm(); 
   addNewCategoryHandler();
   showCategoriesHandler();
-  modifyButtonsHandler();
+  showCategoryLinksHandler();
+  modifyButtonsHandler();  
   createLinkOnLoad()
   .then(() => {   
     showStartup();
   })
-  .catch(err => {
-    console.log("CATCHING ERROR", err);
+  .catch(err => {   
     showError(err.message);
   })
 }
