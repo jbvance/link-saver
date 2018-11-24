@@ -18,6 +18,7 @@ function setupMenu() {
 
   $('.js-show-links').click(function(e) {
     e.preventDefault();
+    displayLinks(state.links);
     showLinksSection();
   })
 }
@@ -317,7 +318,8 @@ function displayLinks(links) {
   $('.js-links-container').html(strHtml);
 }
 
-function displayCategories(categories) { 
+function displayCategories(categories = null) {
+  if (!categories) categories = state.categories; 
   const strHtml = categories.map(category => {
     const title = category.name
     return `<div class="link-row">   
@@ -465,11 +467,9 @@ function watchEditAddCategoryForm() {
       httpMethod = 'PUT';
     } else if (mode === 'add') {
       httpMethod = 'POST';
-    }
-    console.log('MODE', mode);      
+    }       
     saveCategory(httpMethod, name, categoryId)
-    .then(res => {
-      console.log("AFTER saveCategory", res);
+    .then(res => {     
       updateCategoryStateAfterSave(res.data);
       displayCategories(state.categories);     
     })
