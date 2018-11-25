@@ -640,7 +640,7 @@ function searchLinksHandler() {
     //show all links if no search string
     if (!searchString) return displayLinks(state.links);
 
-    const links = state.links.filter(link => link.title.toLowerCase().includes(searchString));
+    const links = state.links.filter(link => link.title.toLowerCase().includes(searchString) || link.url.toLowerCase().includes(searchString));
     console.log('SEARCH RESULTS', links);
     displayLinks(links);
   })
