@@ -219,6 +219,11 @@
   .container * {
     box-sizing: border-box;
   }
+
+  .container h2 {
+    text-align: center;
+    margin: 30px;
+  }
   
   .flex-outer,
   .flex-inner {

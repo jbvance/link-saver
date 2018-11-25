@@ -15,7 +15,8 @@ exports.getLinks = function (req, res) {
             user: req.user.id
         })
         .populate('category')
-        .lean().populate('user', '_id username firstName lastName')          
+        .lean().populate('user', '_id username firstName lastName')    
+        .sort({createdAt: -1})      
         .then(links => {            
             return res.status(200).json({
                 data: links

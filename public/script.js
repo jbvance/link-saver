@@ -296,12 +296,16 @@ function validUrl(url) {
   return !result || result.length < 1 ? false : true;
 }
 
-function displayLinks(links) { 
+function displayLinks(links, category = null) { 
   hideError();
   if (!links || links.length < 1) {
     return showError('No Links to display')
   }
-  const strHtml = links.map(link => {
+  let strHtml = '';
+  if (category) {
+    strHtml += `<h2>${category}</h2>`
+  }
+  strHtml += links.map(link => {
     const title = link.title || link.url;   
     const favIcon = link.favIcon || '/images/default-icon.png'; 
     return `<div class="link-row">
@@ -410,7 +414,9 @@ function showEditAddCategoryForm(category = null) {
 
   if (category) {
     form.find('#name').val(category.name);      
-  }     
+  }  else {
+    form.find('#name').val('');
+  }    
   showSection('js-edit-add-category-container');  
 }
 
@@ -487,8 +493,7 @@ function showAddCategoryForm(id) {
 
 function watchEditAddLinkForm() {
   $('.js-edit-add-form').submit(function (e) {
-    hideError();
-    console.log("SUBMIT");
+    hideError();   
     e.preventDefault();    
     const title = $(this).find('#title').val();
     const url = $(this).find('#url').val();
@@ -501,8 +506,7 @@ function watchEditAddLinkForm() {
       httpMethod = 'PUT';
     } else if (mode === 'add') {
       httpMethod = 'POST';
-    }
-    console.log('MODE', mode);      
+    }      
     saveLink(httpMethod, url, category, linkId, title, note)
     .then(res => {
       updateLinksState(res.data);
@@ -618,12 +622,11 @@ function showCategoryLinksHandler() {
     event.preventDefault();
     console.log('TEXT', $(this).text());
     const category = state.categories.find(category => category.name === $(this).text());
-    console.log('CATEGORY', category);
     const links = state.links.filter(link => {
       console.log(link.category._id, category._id, link.category._id === category._id);
       return link.category === category._id || link.category._id === category._id;
     })
-   displayLinks(links);
+   displayLinks(links, category.name);
   })
 }
 
