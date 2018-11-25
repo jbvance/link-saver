@@ -296,6 +296,28 @@
     justify-content: flex-end;  
   }
 
+  .search-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: center;    
+    padding: 0;        
+  }
+
+  .search-textbox {
+    width: 100%;
+    min-height: 50px;
+    margin-left: 0; 
+    outline: none;
+    border: 1px solid rgb(237, 238, 239);
+        
+  }
+
+  .search-box {    
+    width: 100%;   
+    margin-bottom: 20px; 
+  }
+
   @media screen and (min-width: 768px) {
 
     .master-container {

@@ -18,9 +18,9 @@ function setupMenu() {
 
   $('.js-show-links').click(function(e) {
     e.preventDefault();
-    displayLinks(state.links);
+    displayLinks(state.links, null, true);
     
-  })
+  });
 }
 
 function watchLoginForm() {  
@@ -238,7 +238,6 @@ function showLogin() {
   showSection('js-login-container');  
 }
 
-
 function getLinks() {
   return new Promise((resolve, reject) => {
     if (!isLoggedIn) return [];
@@ -299,9 +298,11 @@ function validUrl(url) {
 function displayLinks(links, category = null) { 
   hideError();
   if (!links || links.length < 1) {
-    return showError('No Links to display')
+    console.log('NO LINKS');
+    $('.js-links-container').html('');
+   return showError('No Links to display')
   }
-  let strHtml = '';
+  let strHtml = '';  
   if (category) {
     strHtml += `<h2>${category}</h2>`
   }
@@ -346,7 +347,7 @@ function showLinks() {
   })  
   .then((categories) => {
     state.categories = categories;
-    displayLinks(links);    
+    displayLinks(links, null, true);    
   })
   .catch(err => {
     showError(`Unable to get links for display - ${err.message}`);
@@ -630,6 +631,21 @@ function showCategoryLinksHandler() {
   })
 }
 
+function searchLinksHandler() {
+  $('.js-search-container').on('keyup', '.js-search-text', function(event) {
+    //event.preventDefault();
+    console.log('CHANGED', $(this).val());
+    const searchString = $(this).val().toLowerCase();
+    
+    //show all links if no search string
+    if (!searchString) return displayLinks(state.links);
+
+    const links = state.links.filter(link => link.title.toLowerCase().includes(searchString));
+    console.log('SEARCH RESULTS', links);
+    displayLinks(links);
+  })
+}
+
 function initApp() {   
   getUrlToSave();
   setupMenu();
@@ -640,6 +656,7 @@ function initApp() {
   showCategoriesHandler();
   showCategoryLinksHandler();
   modifyButtonsHandler();  
+  searchLinksHandler();
   createLinkOnLoad()
   .then(() => {   
     showStartup();
