@@ -11,16 +11,26 @@ function setupMenu() {
     mainNav.toggleClass('active');
   });
 
-  $('.js-add-new-link').click(function(e)  {
+  $('.js-add-new-link').click(function(e)  {    
     e.preventDefault();
-    showAddLinkForm();
+    if (isLoggedIn()) {
+      showAddLinkForm();
+    } else {
+      showLogin();
+    }
+    
   })
 
   $('.js-show-links').click(function(e) {
-    e.preventDefault();
-    displayLinks(state.links, null, true);
+    e.preventDefault();    
+    if (isLoggedIn()) {
+      displayLinks(state.links, null, true);
+    } else {
+      showLogin();
+    }
     
   });
+  
 }
 
 function watchLoginForm() {  
@@ -50,6 +60,7 @@ function watchLoginForm() {
     .then(json => {    
       // save the JWT to sessionStorage        
       sessionStorage.setItem('jwt', json.authToken);
+      $('.js-login-container').hide();
       //  If the user had entered a url to get to the page and was not yet logged in,
       // go ahead and save the link the user had entered (which should be saved in sessionStorage)
       if (sessionStorage.getItem('urlToSave')) {
@@ -347,7 +358,9 @@ function showLinks() {
   })  
   .then((categories) => {
     state.categories = categories;
-    displayLinks(links, null, true);    
+    displayLinks(links, null, true);  
+    // show search textbox
+    $('.js-search-text').show();  
   })
   .catch(err => {
     showError(`Unable to get links for display - ${err.message}`);
@@ -377,14 +390,15 @@ function modifyButtonsHandler() {
   });
 }
 
-function showEditAddLinkForm(link = null) { 
-  showSection('js-edit-add-container');    
+function showEditAddLinkForm(link = null) {      
 
   const form = $('.js-edit-add-form');
   let categoryOptions = '';
-  let linkCategory = '';
+  let linkCategory = '';  
+  let header = 'Add a New Link';
 
   if (link) {
+    header = 'Edit Link'
     form.find('#title').val(link.title);
     form.find('#url').val(link.url);
     form.find('#note').val(link.note);
@@ -407,6 +421,10 @@ function showEditAddLinkForm(link = null) {
   }
 
   form.find('#category').html(categoryOptions);
+  $('.js-add-edit-link-header').text(header);
+
+  //show the form
+  showSection('js-edit-add-container');
 }
 
 function showEditAddCategoryForm(category = null) {   
@@ -414,9 +432,11 @@ function showEditAddCategoryForm(category = null) {
   const form = $('.js-edit-add-category-form');  
 
   if (category) {
+    $('.js-edit-add-category-header').text('Edit Category');
     form.find('#name').val(category.name);      
   }  else {
-    form.find('#name').val('');
+    $('.js-edit-add-category-header').text('Add Category');
+    form.find('#name').val('');    
   }    
   showSection('js-edit-add-category-container');  
 }
@@ -607,13 +627,13 @@ function deleteCategory(id) {
 
 function addNewCategoryHandler() {
   $('.js-new-category').click(function(e) { 
-    showAddCategoryForm();
+    isLoggedIn() ? showAddCategoryForm() : showLogin();
   });
 }
 
 function showCategoriesHandler() {
   $('.js-show-categories').click(function(e) {
-    displayCategories(state.categories);
+    isLoggedIn() ? displayCategories(state.categories) : showLogin();;
   });
 }
 
@@ -632,16 +652,13 @@ function showCategoryLinksHandler() {
 }
 
 function searchLinksHandler() {
-  $('.js-search-container').on('keyup', '.js-search-text', function(event) {
-    //event.preventDefault();
-    console.log('CHANGED', $(this).val());
+  $('.js-search-container').on('keyup', '.js-search-text', function(event) {    
     const searchString = $(this).val().toLowerCase();
     
     //show all links if no search string
     if (!searchString) return displayLinks(state.links);
 
-    const links = state.links.filter(link => link.title.toLowerCase().includes(searchString) || link.url.toLowerCase().includes(searchString));
-    console.log('SEARCH RESULTS', links);
+    const links = state.links.filter(link => link.title.toLowerCase().includes(searchString) || link.url.toLowerCase().includes(searchString));    
     displayLinks(links);
   })
 }

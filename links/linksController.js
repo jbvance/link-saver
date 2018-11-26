@@ -163,7 +163,8 @@ exports.createLink = async function (req, res) {
             if (!category) catToFind = 'none'; // if an invalid objectID for category was passed in, default the category to 'none'
         } else {
             category = await Category.findOne({
-                name: catToFind.toLowerCase()
+                name: catToFind.toLowerCase(),
+                user: req.user.id
             }); 
         }                    
         if (!category) {                                 

@@ -28,7 +28,7 @@
     border-color: #f5c6cb;
 }
 
-  .js-login-container, .js-links-container, .js-edit-add-category-container {
+  .js-login-container, .js-links-container, .js-edit-add-category-container, .js-search-text {
     display: none;
   }
 
@@ -280,7 +280,7 @@
     margin-left: auto;
     padding: 8px 16px;
     border: none;
-    background: #333;
+    background: rgb(92,184,92);
     color: #f2f2f2;
     text-transform: uppercase;
     letter-spacing: .09em;
@@ -309,6 +309,7 @@
     min-height: 50px;
     margin-left: 0; 
     outline: none;
+    padding: 10px;
     border: 1px solid rgb(237, 238, 239);
         
   }
