@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const LinkSchema = mongoose.Schema({
+const linkSchema = mongoose.Schema({
   url: {
     type: String,
     required: true, 
@@ -34,19 +34,8 @@ const LinkSchema = mongoose.Schema({
   }
 }, {timestamps: true });
 
-const CategorySchema = mongoose.Schema({
-    name: {
-      type: String,
-      required: true, 
-      lowercase: true   
-    },   
-    user: { type: mongoose.Schema.Types.ObjectId, 
-              ref: 'User',
-              required: true 
-            }
-  }, { timestamps: true });
 
 
-const Link = mongoose.model('Link', LinkSchema);
+const Link = mongoose.model('Link', linkSchema);
 
 module.exports = {Link};

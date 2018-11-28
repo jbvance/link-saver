@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-const CategorySchema = mongoose.Schema({
+const categorySchema = mongoose.Schema({
     name: {
       type: String,
       required: true, 
@@ -16,6 +16,6 @@ const CategorySchema = mongoose.Schema({
   }, { timestamps: true });
 
 
-const Category = mongoose.model('Category', CategorySchema);
+const Category = mongoose.model('Category', categorySchema);
 
 module.exports = {Category};

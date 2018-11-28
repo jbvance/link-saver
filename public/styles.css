@@ -32,10 +32,6 @@
     display: none;
   }
 
-  .test {
-    border: 1px solid red;
-  }
-
   .master-container {
     display: flex;
     flex-direction: column;
@@ -49,8 +45,17 @@
     
   }
 
+  .categories-container {
+    
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column; 
+    flex-grow: 1;        
+  }
+
   
   .link-row {
+    background-color: #fcfcfc;
     display: flex;
     flex-direction: row;
     justify-content: stretch;
