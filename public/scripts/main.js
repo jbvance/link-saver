@@ -82,7 +82,7 @@ function watchLoginForm() {
 }
 
 function saveLink(httpMethod, url, category = null, linkId = null, title = null, note = null) {
-  hideError();
+  hideError();  
   return new Promise((resolve, reject) => {    
     if (!sessionStorage.getItem('jwt')) {
       console.error('You must be logged in to save a link');
@@ -105,16 +105,15 @@ function saveLink(httpMethod, url, category = null, linkId = null, title = null,
         })
       })
       .then(res => {
-        if (!res.ok) {
-          throw new Error ('Unable to save link. Please try again');
+        if (!res.ok) {         
+          throw new Error ('Unable to save link. Please verify that the url is formmated correctly and try again');
         }        
         return res.json()
       })
       .then(resJson => {       
         resolve(resJson);
       })
-      .catch(err => {
-        console.error(err);        
+      .catch(err => {             
         reject({message: err.message});
       })
   });
