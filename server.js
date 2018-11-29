@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
+const enforce = require('express-sslify');
 const path = require('path');
 const errorHandlers = require('./errorHandlers');
 
@@ -23,6 +24,11 @@ if (process.env.NODE_ENV === 'test') {
 //console.log("DATBASE_URL", DATABASE_URL);
 
 const app = express();
+
+// force ssl in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(enforce.HTTPS({ trustProtoHeader: true }))
+}
 
 // static assets
 app.use(express.static('public'));
@@ -89,46 +95,6 @@ let server;
 
 function runServer() {
   return new Promise((resolve, reject) => {
-    /*************************************************
-     * POSTGRES SPECIFIC STUFF
-     ************************************************/
-
-    
-    // const sequelize = new Sequelize(process.env.PG_DB_NAME, process.env.PG_DB_USER, process.env.PG_DB_PASSWORD, {
-    //   host: process.env.PG_DB_HOST,
-    //   dialect: 'postgres',
-    //   "ssl": true,
-    //   "dialectOptions": {
-    //       "ssl": true
-    //   },
-    //   operatorsAliases: false,
-    
-    //   pool: {
-    //     max: 5,
-    //     min: 0,
-    //     acquire: 30000,
-    //     idle: 10000
-    //   },
-    // });
-    // const User = sequelize.define('user', {
-    //   firstName: {
-    //     type: Sequelize.STRING
-    //   },
-    //   lastName: {
-    //     type: Sequelize.STRING
-    //   }
-    // });
-    
-    // // force: true will drop the table if it already exists
-    // User.sync({force: true}).then(() => {
-    //   // Table created
-    //   return User.create({
-    //     firstName: 'John',
-    //     lastName: 'Hancock'
-    //   });
-    // });
-
-     /**END OF POSTGRES SPECIFIC STUFF */
 
     mongoose.connect(DATABASE_URL, { useMongoClient: true }, err => {
       if (err) {
