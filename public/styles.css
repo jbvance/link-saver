@@ -107,6 +107,12 @@
     text-decoration: none;
     color: rgba(255, 255, 255, 0.7);
   }
+
+  .logo {
+    text-transform: uppercase;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: .5em;
+  }
   
   .main-nav li {
     text-align: center;
