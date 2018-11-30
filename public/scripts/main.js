@@ -65,6 +65,7 @@ function watchLoginForm() {
       if (sessionStorage.getItem('urlToSave')) {
         saveLink('POST', sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
         .then(() => {
+          // now delete the link that had been saved to sessionStorage
           clearLinkToSave();
           showLinks();
         })
@@ -259,8 +260,7 @@ function getLinks() {
       })
       .then(res => res.json())
       .then(resJson => {       
-        state.links = resJson.data;
-        //state.categories = getCategories();
+        state.links = resJson.data;        
         resolve(resJson.data)
       })
       .catch(err => {
@@ -660,6 +660,15 @@ function searchLinksHandler() {
   })
 }
 
+function showLoading() {
+  console.log('SHOWING');
+  $('.js-loading').show();
+}
+
+function hideLoading() {
+  $('.js-loading').hide();
+}
+
 function initApp() {   
   getUrlToSave();
   setupMenu();
@@ -674,8 +683,9 @@ function initApp() {
   createLinkOnLoad()
   .then(() => {   
     showStartup();
+    //hideLoading();
   })
-  .catch(err => {   
+  .catch(err => {      
     showError(err.message);
   })
 }
