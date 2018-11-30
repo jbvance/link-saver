@@ -125,6 +125,10 @@
     margin-top: 10px;
     margin-left: 20px;
   }
+
+  .loading-spinner {
+    margin-right: 10px;
+  }
   
   .navbar-toggle {
     position: absolute;
