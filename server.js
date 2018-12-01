@@ -60,13 +60,6 @@ app.use('/api/auth/', authRouter);
 app.use('/api/links', linksRouter);
 app.use('/api/categories', categoriesRouter);
 
-// A protected endpoint which needs a valid JWT to access it
-app.get('/api/protected', jwtAuth, (req, res) => {
-  return res.json({
-    data: 'rosebud'
-  });
-});
-
 // This is the GET route for when a user preprends the app's domain to the url to bookmark (along with a possible category name)
 // This route takes the url path and creates the link, along with a category if supplied by category-name--
 //app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , jwtAuth, linksController.createLink);
