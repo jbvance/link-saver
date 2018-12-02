@@ -482,6 +482,10 @@ function watchEditAddCategoryForm() {
     const name = $(this).find('#name').val();;
     const mode = $(this).find('#mode').val();
     const categoryId = $(this).find('#categoryId').val();
+    //verify name has no spaces
+    if (name.includes(' ')) {
+      return showError('No spaces are allowed in category name.')
+    }
     let httpMethod = null;
     if (mode === 'edit') {
       httpMethod = 'PUT';
