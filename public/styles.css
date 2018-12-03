@@ -239,6 +239,10 @@
     text-align: center;
     margin: 30px;
   }
+
+  .container h3 {
+    text-align: center;
+  }
   
   .flex-outer,
   .flex-inner {
@@ -349,6 +353,11 @@
     font-size: 1.2em;
   }
 
+  .tutorial section h3 {
+    text-align: center;
+    background-color: #f4f2a4
+  }
+
   .tutorial-header {
     background-color: #000;
     color: white;
@@ -361,7 +370,7 @@
   .tutorial-img {
    width: 100%;
    height: auto;
-  }
+  }  
 
   @media screen and (min-width: 768px) {
 
