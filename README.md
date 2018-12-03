@@ -5,7 +5,7 @@ A simple, web-based app that allows you to save all of your bookmarks in the clo
 Login
 =====
 
-![Caption of Login screen](images/tutorial/tutorial-login.gif)
+![Caption of Login screen](public/images/tutorial/tutorial-login.gif)
 
 Save a link while browsing the web
 ==================================
