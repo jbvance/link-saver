@@ -63,11 +63,13 @@ function watchLoginForm() {
       //  If the user had entered a url to get to the page and was not yet logged in,
       // go ahead and save the link the user had entered (which should be saved in sessionStorage)
       if (sessionStorage.getItem('urlToSave')) {
+        showLoading();
         saveLink('POST', sessionStorage.getItem('urlToSave'), sessionStorage.getItem('category'))
         .then(() => {
           // now delete the link that had been saved to sessionStorage
           clearLinkToSave();
-          showLinks();
+          hideLoading();
+          showLinks();                  
         })
         .catch(err => { throw new Error( err.message )});
       } else {
@@ -195,6 +197,8 @@ function createLinkOnLoad() {
     // upon a successful login
     if (!isLoggedIn) return resolve();    
 
+    showLoading();
+
     const url = sessionStorage.getItem('urlToSave');   
     if (url) {
       saveLink('POST', url, sessionStorage.getItem('category'))
@@ -202,12 +206,15 @@ function createLinkOnLoad() {
           //clear out sessionStorage
           clearLinkToSave();
           resolve();
+          hideLoading();
         })
         .catch(err => {
+          hideLoading();
           console.error(err);          
           reject(err);
         });
     } else { 
+      hideLoading();
       resolve();
     }
   });
@@ -664,8 +671,7 @@ function searchLinksHandler() {
   })
 }
 
-function showLoading() {
-  console.log('SHOWING');
+function showLoading() {  
   $('.js-loading').show();
 }
 

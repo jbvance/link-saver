@@ -21,8 +21,6 @@ if (process.env.NODE_ENV === 'test') {
   DATABASE_URL = "mongodb://localhost/jwt-auth-demo";
 }
 
-//console.log("DATBASE_URL", DATABASE_URL);
-
 const app = express();
 
 // force ssl in production
@@ -73,9 +71,7 @@ app.get('/api/protected', jwtAuth, (req, res) => {
 // This is the GET route for when a user preprends the app's domain to the url to bookmark (along with a possible category name)
 // This route takes the url path and creates the link, along with a category if supplied by category-name--
 //app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , jwtAuth, linksController.createLink);
-app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , (req, res) => {
-  console.log("URL", req.originalUrl);
-  //res.sendFile(path.join(__dirname + '/public/index.html?test=test'));
+app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , (req, res) => {  
   res.redirect('/?saveLink=' + req.originalUrl);
 });
 
