@@ -1,4 +1,4 @@
-# Linxify
+# Linxify - [https://www.linxify.net](https://www.linxify.net)
 
 A simple, web-based app that allows you to save all of your bookmarks in the cloud. Just enter linxify.net/ before any url, and instantly save your bookmark.
 
