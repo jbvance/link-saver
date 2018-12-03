@@ -16,7 +16,7 @@ To save a link with a category, after linxify.net/, simply add the category name
 
   
   
-![Save link while browsing the web](images/tutorial/tutorial-external-link.gif)
+![Save link while browsing the web](public/images/tutorial/tutorial-external-link.gif)
 
 Search for links
 ================
