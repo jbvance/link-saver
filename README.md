@@ -25,7 +25,7 @@ Use the search bar to filter your list of links. If the search entered is found 
 
   
   
-![Search links](images/tutorial/tutorial-search.gif)
+![Search links](public/images/tutorial/tutorial-search.gif)
 
 Edit or add a link manually
 ===========================
@@ -34,11 +34,11 @@ You can also edit or add a link directly within the website, with the option to 
 
   
   
-![Edit or add link manually](images/tutorial/tutorial-edit-link.jpg)
+![Edit or add link manually](;ublic/images/tutorial/tutorial-edit-link.jpg)
 
 View, edit and add categories
 =============================
 
   
   
-![Edit or add link manually](images/tutorial/tutorial-categories.jpg)
+![Edit or add link manually](public/images/tutorial/tutorial-categories.jpg)
