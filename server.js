@@ -63,11 +63,6 @@ app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname + '/public/demo.html'));
 });
 
-//protected route
-app.get('/api/protected', jwtAuth, (req, res) => {
-  res.json({data: 'rosebud'})
-})
-
 // This is the GET route for when a user preprends the app's domain to the url to bookmark (along with a possible category name)
 // This route takes the url path and creates the link, along with a category if supplied by category-name--
 //app.get(/^\/([a-zA-Z0-9]{0,}-[a-zA-Z0-9]*){0,}(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+){0,}\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ , jwtAuth, linksController.createLink);
@@ -79,7 +74,7 @@ app.use('*', (req, res) => {
   return res.status(404).json({ message: 'Not Found' });
 });
 
-// Otherwise this was a really bad error we didn't expect! Shoot eh
+// Otherwise this was a really bad error we didn't expect
 if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {  
   /* Development Error Handler - Prints stack trace */
   app.use(errorHandlers.developmentErrors);
