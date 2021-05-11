@@ -24,7 +24,7 @@
     "metascraper": "^4.5.5",
     "metascraper-logo": "^4.5.5",
     "metascraper-title": "^4.5.5",
-    "mongoose": "^4.7.4",
+    "mongoose": "^5.10.11",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
